@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file adjacent_difference.h
  *  \brief Generic implementation of adjacent_difference.
  */
@@ -22,6 +21,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/system/detail/generic/tag.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -32,21 +39,17 @@ namespace detail
 namespace generic
 {
 
+template <typename DerivedPolicy, typename InputIterator, typename OutputIterator>
+_CCCL_HOST_DEVICE OutputIterator adjacent_difference(
+  thrust::execution_policy<DerivedPolicy>& exec, InputIterator first, InputIterator last, OutputIterator result);
 
-template<typename DerivedPolicy, typename InputIterator, typename OutputIterator>
-__host__ __device__
-OutputIterator adjacent_difference(thrust::execution_policy<DerivedPolicy> &exec,
-                                   InputIterator first, InputIterator last,
-                                   OutputIterator result);
-
-
-template<typename DerivedPolicy, typename InputIterator, typename OutputIterator, typename BinaryFunction>
-__host__ __device__
-OutputIterator adjacent_difference(thrust::execution_policy<DerivedPolicy> &exec,
-                                   InputIterator first, InputIterator last,
-                                   OutputIterator result,
-                                   BinaryFunction binary_op);
-
+template <typename DerivedPolicy, typename InputIterator, typename OutputIterator, typename BinaryFunction>
+_CCCL_HOST_DEVICE OutputIterator adjacent_difference(
+  thrust::execution_policy<DerivedPolicy>& exec,
+  InputIterator first,
+  InputIterator last,
+  OutputIterator result,
+  BinaryFunction binary_op);
 
 } // end namespace generic
 } // end namespace detail
@@ -54,4 +57,3 @@ OutputIterator adjacent_difference(thrust::execution_policy<DerivedPolicy> &exec
 THRUST_NAMESPACE_END
 
 #include <thrust/system/detail/generic/adjacent_difference.inl>
-

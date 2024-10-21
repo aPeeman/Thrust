@@ -22,9 +22,17 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/execution_policy.h>
-#include <thrust/system/detail/generic/tag.h>
 #include <thrust/detail/static_assert.h>
+#include <thrust/system/detail/generic/tag.h>
 
 THRUST_NAMESPACE_BEGIN
 namespace system
@@ -34,44 +42,25 @@ namespace detail
 namespace generic
 {
 
-
-template<typename DerivedPolicy,
-         typename InputIterator,
-         typename UnaryFunction>
-__host__ __device__
-InputIterator for_each(thrust::execution_policy<DerivedPolicy> &,
-                       InputIterator first,
-                       InputIterator ,
-                       UnaryFunction )
+template <typename DerivedPolicy, typename InputIterator, typename UnaryFunction>
+_CCCL_HOST_DEVICE InputIterator
+for_each(thrust::execution_policy<DerivedPolicy>&, InputIterator first, InputIterator, UnaryFunction)
 {
-  THRUST_STATIC_ASSERT_MSG(
-    (thrust::detail::depend_on_instantiation<InputIterator, false>::value)
-  , "unimplemented for this system"
-  );
+  THRUST_STATIC_ASSERT_MSG((thrust::detail::depend_on_instantiation<InputIterator, false>::value),
+                           "unimplemented for this system");
   return first;
 } // end for_each()
 
-
-template<typename DerivedPolicy,
-         typename InputIterator,
-         typename Size,
-         typename UnaryFunction>
-__host__ __device__
-InputIterator for_each_n(thrust::execution_policy<DerivedPolicy> &,
-                         InputIterator first,
-                         Size ,
-                         UnaryFunction )
+template <typename DerivedPolicy, typename InputIterator, typename Size, typename UnaryFunction>
+_CCCL_HOST_DEVICE InputIterator
+for_each_n(thrust::execution_policy<DerivedPolicy>&, InputIterator first, Size, UnaryFunction)
 {
-  THRUST_STATIC_ASSERT_MSG(
-    (thrust::detail::depend_on_instantiation<InputIterator, false>::value)
-  , "unimplemented for this system"
-  );
+  THRUST_STATIC_ASSERT_MSG((thrust::detail::depend_on_instantiation<InputIterator, false>::value),
+                           "unimplemented for this system");
   return first;
 } // end for_each_n()
-
 
 } // end namespace generic
 } // end namespace detail
 } // end namespace system
 THRUST_NAMESPACE_END
-

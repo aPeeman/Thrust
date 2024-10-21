@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file partition.h
  *  \brief Sequential implementations of partition functions.
  */
@@ -22,21 +21,28 @@
 #pragma once
 
 #include <thrust/detail/config.h>
-#include <thrust/pair.h>
-#include <thrust/detail/temporary_array.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/function.h>
+#include <thrust/detail/temporary_array.h>
+#include <thrust/pair.h>
 #include <thrust/system/detail/sequential/execution_policy.h>
 
 THRUST_NAMESPACE_BEGIN
 namespace detail
 {
 
-
 // XXX WAR an unfortunate circular #inclusion problem
-template<typename,typename> class temporary_array;
+template <typename, typename>
+class temporary_array;
 
-
-} // end detail
+} // namespace detail
 
 namespace system
 {
@@ -45,12 +51,9 @@ namespace detail
 namespace sequential
 {
 
-
-__thrust_exec_check_disable__
-template<typename ForwardIterator1,
-         typename ForwardIterator2>
-__host__ __device__
-void iter_swap(ForwardIterator1 iter1, ForwardIterator2 iter2)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename ForwardIterator1, typename ForwardIterator2>
+_CCCL_HOST_DEVICE void iter_swap(ForwardIterator1 iter1, ForwardIterator2 iter2)
 {
   // XXX this isn't correct because it doesn't use thrust::swap
   using namespace thrust::detail;
@@ -62,37 +65,32 @@ void iter_swap(ForwardIterator1 iter1, ForwardIterator2 iter2)
   *iter2 = temp;
 }
 
-
-__thrust_exec_check_disable__
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename Predicate>
-__host__ __device__
-  ForwardIterator partition(sequential::execution_policy<DerivedPolicy> &,
-                            ForwardIterator first,
-                            ForwardIterator last,
-                            Predicate pred)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy, typename ForwardIterator, typename Predicate>
+_CCCL_HOST_DEVICE ForwardIterator
+partition(sequential::execution_policy<DerivedPolicy>&, ForwardIterator first, ForwardIterator last, Predicate pred)
 {
-  if(first == last)
+  if (first == last)
+  {
     return first;
+  }
 
   // wrap pred
-  thrust::detail::wrapped_function<
-    Predicate,
-    bool
-  > wrapped_pred(pred);
+  thrust::detail::wrapped_function<Predicate, bool> wrapped_pred(pred);
 
-  while(wrapped_pred(*first))
+  while (wrapped_pred(*first))
   {
-    if(++first == last)
+    if (++first == last)
+    {
       return first;
+    }
   }
 
   ForwardIterator next = first;
 
-  while(++next != last)
+  while (++next != last)
   {
-    if(wrapped_pred(*next))
+    if (wrapped_pred(*next))
     {
       // Fully qualify name to disambiguate overloads found via ADL.
       THRUST_NS_QUALIFIER::system::detail::sequential::iter_swap(first, next);
@@ -103,32 +101,27 @@ __host__ __device__
   return first;
 }
 
-
-__thrust_exec_check_disable__
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename InputIterator,
-         typename Predicate>
-__host__ __device__
-  ForwardIterator partition(sequential::execution_policy<DerivedPolicy> &,
-                            ForwardIterator first,
-                            ForwardIterator last,
-                            InputIterator stencil_first,
-                            Predicate pred)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy, typename ForwardIterator, typename InputIterator, typename Predicate>
+_CCCL_HOST_DEVICE ForwardIterator partition(
+  sequential::execution_policy<DerivedPolicy>&,
+  ForwardIterator first,
+  ForwardIterator last,
+  InputIterator stencil_first,
+  Predicate pred)
 {
-  if(first == last)
+  if (first == last)
+  {
     return first;
+  }
 
   // wrap pred
-  thrust::detail::wrapped_function<
-    Predicate,
-    bool
-  > wrapped_pred(pred);
+  thrust::detail::wrapped_function<Predicate, bool> wrapped_pred(pred);
 
-  while(wrapped_pred(*stencil_first))
+  while (wrapped_pred(*stencil_first))
   {
     ++stencil_first;
-    if(++first == last)
+    if (++first == last)
     {
       return first;
     }
@@ -139,9 +132,9 @@ __host__ __device__
   // advance stencil to next element as well
   ++stencil_first;
 
-  while(++next != last)
+  while (++next != last)
   {
-    if(wrapped_pred(*stencil_first))
+    if (wrapped_pred(*stencil_first))
     {
       // Fully qualify name to disambiguate overloads found via ADL.
       THRUST_NS_QUALIFIER::system::detail::sequential::iter_swap(first, next);
@@ -154,33 +147,29 @@ __host__ __device__
   return first;
 }
 
-
-__thrust_exec_check_disable__
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename Predicate>
-__host__ __device__
-  ForwardIterator stable_partition(sequential::execution_policy<DerivedPolicy> &exec,
-                                   ForwardIterator first,
-                                   ForwardIterator last,
-                                   Predicate pred)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy, typename ForwardIterator, typename Predicate>
+_CCCL_HOST_DEVICE ForwardIterator stable_partition(
+  sequential::execution_policy<DerivedPolicy>& exec, ForwardIterator first, ForwardIterator last, Predicate pred)
 {
+  if (first == last)
+  {
+    return first;
+  }
+
   // wrap pred
-  thrust::detail::wrapped_function<
-    Predicate,
-    bool
-  > wrapped_pred(pred);
+  thrust::detail::wrapped_function<Predicate, bool> wrapped_pred(pred);
 
   typedef typename thrust::iterator_value<ForwardIterator>::type T;
 
-  typedef thrust::detail::temporary_array<T,DerivedPolicy> TempRange;
-  typedef typename TempRange::iterator                     TempIterator;
+  typedef thrust::detail::temporary_array<T, DerivedPolicy> TempRange;
+  typedef typename TempRange::iterator TempIterator;
 
   TempRange temp(exec, first, last);
 
-  for(TempIterator iter = temp.begin(); iter != temp.end(); ++iter)
+  for (TempIterator iter = temp.begin(); iter != temp.end(); ++iter)
   {
-    if(wrapped_pred(*iter))
+    if (wrapped_pred(*iter))
     {
       *first = *iter;
       ++first;
@@ -189,9 +178,9 @@ __host__ __device__
 
   ForwardIterator middle = first;
 
-  for(TempIterator iter = temp.begin(); iter != temp.end(); ++iter)
+  for (TempIterator iter = temp.begin(); iter != temp.end(); ++iter)
   {
-    if(!wrapped_pred(*iter))
+    if (!wrapped_pred(*iter))
     {
       *first = *iter;
       ++first;
@@ -201,36 +190,29 @@ __host__ __device__
   return middle;
 }
 
-
-__thrust_exec_check_disable__
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename InputIterator,
-         typename Predicate>
-__host__ __device__
-  ForwardIterator stable_partition(sequential::execution_policy<DerivedPolicy> &exec,
-                                   ForwardIterator first,
-                                   ForwardIterator last,
-                                   InputIterator stencil,
-                                   Predicate pred)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy, typename ForwardIterator, typename InputIterator, typename Predicate>
+_CCCL_HOST_DEVICE ForwardIterator stable_partition(
+  sequential::execution_policy<DerivedPolicy>& exec,
+  ForwardIterator first,
+  ForwardIterator last,
+  InputIterator stencil,
+  Predicate pred)
 {
   // wrap pred
-  thrust::detail::wrapped_function<
-    Predicate,
-    bool
-  > wrapped_pred(pred);
+  thrust::detail::wrapped_function<Predicate, bool> wrapped_pred(pred);
 
   typedef typename thrust::iterator_value<ForwardIterator>::type T;
 
-  typedef thrust::detail::temporary_array<T,DerivedPolicy> TempRange;
-  typedef typename TempRange::iterator                     TempIterator;
+  typedef thrust::detail::temporary_array<T, DerivedPolicy> TempRange;
+  typedef typename TempRange::iterator TempIterator;
 
   TempRange temp(exec, first, last);
 
   InputIterator stencil_iter = stencil;
-  for(TempIterator iter = temp.begin(); iter != temp.end(); ++iter, ++stencil_iter)
+  for (TempIterator iter = temp.begin(); iter != temp.end(); ++iter, ++stencil_iter)
   {
-    if(wrapped_pred(*stencil_iter))
+    if (wrapped_pred(*stencil_iter))
     {
       *first = *iter;
       ++first;
@@ -238,11 +220,11 @@ __host__ __device__
   }
 
   ForwardIterator middle = first;
-  stencil_iter = stencil;
+  stencil_iter           = stencil;
 
-  for(TempIterator iter = temp.begin(); iter != temp.end(); ++iter, ++stencil_iter)
+  for (TempIterator iter = temp.begin(); iter != temp.end(); ++iter, ++stencil_iter)
   {
-    if(!wrapped_pred(*stencil_iter))
+    if (!wrapped_pred(*stencil_iter))
     {
       *first = *iter;
       ++first;
@@ -252,31 +234,26 @@ __host__ __device__
   return middle;
 }
 
-
-__thrust_exec_check_disable__
-template<typename DerivedPolicy,
-         typename InputIterator,
-         typename OutputIterator1,
-         typename OutputIterator2,
-         typename Predicate>
-__host__ __device__
-  thrust::pair<OutputIterator1,OutputIterator2>
-    stable_partition_copy(sequential::execution_policy<DerivedPolicy> &,
-                          InputIterator first,
-                          InputIterator last,
-                          OutputIterator1 out_true,
-                          OutputIterator2 out_false,
-                          Predicate pred)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy,
+          typename InputIterator,
+          typename OutputIterator1,
+          typename OutputIterator2,
+          typename Predicate>
+_CCCL_HOST_DEVICE thrust::pair<OutputIterator1, OutputIterator2> stable_partition_copy(
+  sequential::execution_policy<DerivedPolicy>&,
+  InputIterator first,
+  InputIterator last,
+  OutputIterator1 out_true,
+  OutputIterator2 out_false,
+  Predicate pred)
 {
   // wrap pred
-  thrust::detail::wrapped_function<
-    Predicate,
-    bool
-  > wrapped_pred(pred);
+  thrust::detail::wrapped_function<Predicate, bool> wrapped_pred(pred);
 
-  for(; first != last; ++first)
+  for (; first != last; ++first)
   {
-    if(wrapped_pred(*first))
+    if (wrapped_pred(*first))
     {
       *out_true = *first;
       ++out_true;
@@ -291,33 +268,28 @@ __host__ __device__
   return thrust::make_pair(out_true, out_false);
 }
 
-
-__thrust_exec_check_disable__
-template<typename DerivedPolicy,
-         typename InputIterator1,
-         typename InputIterator2,
-         typename OutputIterator1,
-         typename OutputIterator2,
-         typename Predicate>
-__host__ __device__
-  thrust::pair<OutputIterator1,OutputIterator2>
-    stable_partition_copy(sequential::execution_policy<DerivedPolicy> &,
-                          InputIterator1 first,
-                          InputIterator1 last,
-                          InputIterator2 stencil,
-                          OutputIterator1 out_true,
-                          OutputIterator2 out_false,
-                          Predicate pred)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy,
+          typename InputIterator1,
+          typename InputIterator2,
+          typename OutputIterator1,
+          typename OutputIterator2,
+          typename Predicate>
+_CCCL_HOST_DEVICE thrust::pair<OutputIterator1, OutputIterator2> stable_partition_copy(
+  sequential::execution_policy<DerivedPolicy>&,
+  InputIterator1 first,
+  InputIterator1 last,
+  InputIterator2 stencil,
+  OutputIterator1 out_true,
+  OutputIterator2 out_false,
+  Predicate pred)
 {
   // wrap pred
-  thrust::detail::wrapped_function<
-    Predicate,
-    bool
-  > wrapped_pred(pred);
+  thrust::detail::wrapped_function<Predicate, bool> wrapped_pred(pred);
 
-  for(; first != last; ++first, ++stencil)
+  for (; first != last; ++first, ++stencil)
   {
-    if(wrapped_pred(*stencil))
+    if (wrapped_pred(*stencil))
     {
       *out_true = *first;
       ++out_true;
@@ -331,10 +303,8 @@ __host__ __device__
 
   return thrust::make_pair(out_true, out_false);
 }
-
 
 } // end namespace sequential
 } // end namespace detail
 } // end namespace system
 THRUST_NAMESPACE_END
-

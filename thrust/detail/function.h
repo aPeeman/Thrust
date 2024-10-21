@@ -17,6 +17,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/raw_reference_cast.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -30,66 +38,54 @@ struct wrapped_function
   // mutable because Function::operator() might be const
   mutable Function m_f;
 
-  inline __host__ __device__
-  wrapped_function()
+  inline _CCCL_HOST_DEVICE wrapped_function()
       : m_f()
   {}
 
-  inline __host__ __device__
-  wrapped_function(const Function& f)
+  inline _CCCL_HOST_DEVICE wrapped_function(const Function& f)
       : m_f(f)
   {}
 
-  __thrust_exec_check_disable__
+  _CCCL_EXEC_CHECK_DISABLE
   template <typename Argument>
-  inline __host__ __device__
-  Result operator()(Argument& x) const
+  _CCCL_FORCEINLINE _CCCL_HOST_DEVICE Result operator()(Argument& x) const
   {
     return static_cast<Result>(m_f(thrust::raw_reference_cast(x)));
   }
 
-  __thrust_exec_check_disable__
+  _CCCL_EXEC_CHECK_DISABLE
   template <typename Argument>
-  inline __host__ __device__
-  Result operator()(const Argument& x) const
+  _CCCL_FORCEINLINE _CCCL_HOST_DEVICE Result operator()(const Argument& x) const
   {
     return static_cast<Result>(m_f(thrust::raw_reference_cast(x)));
   }
 
-  __thrust_exec_check_disable__
+  _CCCL_EXEC_CHECK_DISABLE
   template <typename Argument1, typename Argument2>
-  inline __host__ __device__
-  Result operator()(Argument1& x, Argument2& y) const
+  _CCCL_FORCEINLINE _CCCL_HOST_DEVICE Result operator()(Argument1& x, Argument2& y) const
   {
-    return static_cast<Result>(m_f(thrust::raw_reference_cast(x),
-                                   thrust::raw_reference_cast(y)));
+    return static_cast<Result>(m_f(thrust::raw_reference_cast(x), thrust::raw_reference_cast(y)));
   }
 
-  __thrust_exec_check_disable__
+  _CCCL_EXEC_CHECK_DISABLE
   template <typename Argument1, typename Argument2>
-  inline __host__ __device__
-  Result operator()(const Argument1& x, Argument2& y) const
+  _CCCL_FORCEINLINE _CCCL_HOST_DEVICE Result operator()(const Argument1& x, Argument2& y) const
   {
-    return static_cast<Result>(m_f(thrust::raw_reference_cast(x),
-                                   thrust::raw_reference_cast(y)));
+    return static_cast<Result>(m_f(thrust::raw_reference_cast(x), thrust::raw_reference_cast(y)));
   }
 
-  __thrust_exec_check_disable__
+  _CCCL_EXEC_CHECK_DISABLE
   template <typename Argument1, typename Argument2>
-  inline __host__ __device__
-  Result operator()(const Argument1& x, const Argument2& y) const
+  _CCCL_FORCEINLINE _CCCL_HOST_DEVICE Result operator()(const Argument1& x, const Argument2& y) const
   {
-    return static_cast<Result>(m_f(thrust::raw_reference_cast(x),
-                                   thrust::raw_reference_cast(y)));
+    return static_cast<Result>(m_f(thrust::raw_reference_cast(x), thrust::raw_reference_cast(y)));
   }
 
-  __thrust_exec_check_disable__
+  _CCCL_EXEC_CHECK_DISABLE
   template <typename Argument1, typename Argument2>
-  inline __host__ __device__
-  Result operator()(Argument1& x, const Argument2& y) const
+  _CCCL_FORCEINLINE _CCCL_HOST_DEVICE Result operator()(Argument1& x, const Argument2& y) const
   {
-    return static_cast<Result>(m_f(thrust::raw_reference_cast(x),
-                                   thrust::raw_reference_cast(y)));
+    return static_cast<Result>(m_f(thrust::raw_reference_cast(x), thrust::raw_reference_cast(y)));
   }
 }; // end wrapped_function
 
@@ -99,58 +95,50 @@ struct wrapped_function<Function, void>
 {
   // mutable because Function::operator() might be const
   mutable Function m_f;
-  inline __host__ __device__
-  wrapped_function()
-    : m_f()
+  inline _CCCL_HOST_DEVICE wrapped_function()
+      : m_f()
   {}
 
-  inline __host__ __device__
-  wrapped_function(const Function& f)
-    : m_f(f)
+  inline _CCCL_HOST_DEVICE wrapped_function(const Function& f)
+      : m_f(f)
   {}
 
-  __thrust_exec_check_disable__
+  _CCCL_EXEC_CHECK_DISABLE
   template <typename Argument>
-  inline __host__ __device__
-  void operator()(Argument& x) const
+  _CCCL_FORCEINLINE _CCCL_HOST_DEVICE void operator()(Argument& x) const
   {
     m_f(thrust::raw_reference_cast(x));
   }
 
-  __thrust_exec_check_disable__
+  _CCCL_EXEC_CHECK_DISABLE
   template <typename Argument>
-  inline __host__ __device__
-  void operator()(const Argument& x) const
+  _CCCL_FORCEINLINE _CCCL_HOST_DEVICE void operator()(const Argument& x) const
   {
     m_f(thrust::raw_reference_cast(x));
   }
 
-  __thrust_exec_check_disable__
+  _CCCL_EXEC_CHECK_DISABLE
   template <typename Argument1, typename Argument2>
-  inline __host__ __device__
-  void operator()(Argument1& x, Argument2& y) const
+  _CCCL_FORCEINLINE _CCCL_HOST_DEVICE void operator()(Argument1& x, Argument2& y) const
   {
     m_f(thrust::raw_reference_cast(x), thrust::raw_reference_cast(y));
   }
 
-  __thrust_exec_check_disable__
+  _CCCL_EXEC_CHECK_DISABLE
   template <typename Argument1, typename Argument2>
-  inline __host__ __device__
-  void operator()(const Argument1& x, Argument2& y) const
+  _CCCL_FORCEINLINE _CCCL_HOST_DEVICE void operator()(const Argument1& x, Argument2& y) const
   {
     m_f(thrust::raw_reference_cast(x), thrust::raw_reference_cast(y));
   }
-  __thrust_exec_check_disable__
+  _CCCL_EXEC_CHECK_DISABLE
   template <typename Argument1, typename Argument2>
-  inline __host__ __device__
-  void operator()(const Argument1& x, const Argument2& y) const
+  _CCCL_FORCEINLINE _CCCL_HOST_DEVICE void operator()(const Argument1& x, const Argument2& y) const
   {
     m_f(thrust::raw_reference_cast(x), thrust::raw_reference_cast(y));
   }
-  __thrust_exec_check_disable__
+  _CCCL_EXEC_CHECK_DISABLE
   template <typename Argument1, typename Argument2>
-  inline __host__ __device__
-  void operator()(Argument1& x, const Argument2& y) const
+  _CCCL_FORCEINLINE _CCCL_HOST_DEVICE void operator()(Argument1& x, const Argument2& y) const
   {
     m_f(thrust::raw_reference_cast(x), thrust::raw_reference_cast(y));
   }

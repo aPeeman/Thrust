@@ -18,6 +18,14 @@
 
 #include <thrust/detail/config.h>
 
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 // the purpose of this header is to #include the replace.h header
 // of the sequential, host, and device systems. It should be #included in any
 // code which uses adl to dispatch replace
@@ -28,10 +36,10 @@
 // includes, so we fake it out by specifying all possible files we might end up
 // including inside an #if 0.
 #if 0
-#include <thrust/system/cpp/detail/replace.h>
-#include <thrust/system/cuda/detail/replace.h>
-#include <thrust/system/omp/detail/replace.h>
-#include <thrust/system/tbb/detail/replace.h>
+#  include <thrust/system/cpp/detail/replace.h>
+#  include <thrust/system/cuda/detail/replace.h>
+#  include <thrust/system/omp/detail/replace.h>
+#  include <thrust/system/tbb/detail/replace.h>
 #endif
 
 #define __THRUST_HOST_SYSTEM_REPLACE_HEADER <__THRUST_HOST_SYSTEM_ROOT/detail/replace.h>
@@ -41,4 +49,3 @@
 #define __THRUST_DEVICE_SYSTEM_REPLACE_HEADER <__THRUST_DEVICE_SYSTEM_ROOT/detail/replace.h>
 #include __THRUST_DEVICE_SYSTEM_REPLACE_HEADER
 #undef __THRUST_DEVICE_SYSTEM_REPLACE_HEADER
-

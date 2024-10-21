@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file sequence.h
  *  \brief Fills a range with a sequence of numbers
  */
@@ -22,6 +21,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/execution_policy.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -30,10 +37,9 @@ THRUST_NAMESPACE_BEGIN
  *  \{
  */
 
-
 /*! \p sequence fills the range <tt>[first, last)</tt> with a sequence of numbers.
  *
- *  For each iterator \c i in the range <tt>[first, last)</tt>, this version of 
+ *  For each iterator \c i in the range <tt>[first, last)</tt>, this version of
  *  \p sequence performs the assignment <tt>*i =  (i - first)</tt>.
  *
  *  The algorithm's execution is parallelized as determined by \p exec.
@@ -43,10 +49,10 @@ THRUST_NAMESPACE_BEGIN
  *  \param last The end of the sequence.
  *
  *  \tparam DerivedPolicy The name of the derived execution policy.
- *  \tparam ForwardIterator is a model of <a href="https://en.cppreference.com/w/cpp/iterator/forward_iterator">Forward Iterator</a>,
- *          and \p ForwardIterator is mutable,
- *          and if \c x and \c y are objects of \c ForwardIterator's \c value_type, then <tt>x + y</tt> is defined,
- *          and if \c T is \p ForwardIterator's \c value_type, then <tt>T(0)</tt> is defined.
+ *  \tparam ForwardIterator is a model of <a href="https://en.cppreference.com/w/cpp/iterator/forward_iterator">Forward
+ * Iterator</a>, and \p ForwardIterator is mutable, and if \c x and \c y are objects of \c ForwardIterator's \c
+ * value_type, then <tt>x + y</tt> is defined, and if \c T is \p ForwardIterator's \c value_type, then <tt>T(0)</tt> is
+ * defined.
  *
  *  The following code snippet demonstrates how to use \p sequence to fill a range
  *  with a sequence of numbers using the \p thrust::host execution policy for parallelization:
@@ -66,25 +72,22 @@ THRUST_NAMESPACE_BEGIN
  *
  *  \see https://en.cppreference.com/w/cpp/algorithm/iota
  */
-template<typename DerivedPolicy, typename ForwardIterator>
-__host__ __device__
-  void sequence(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-                ForwardIterator first,
-                ForwardIterator last);
-
+template <typename DerivedPolicy, typename ForwardIterator>
+_CCCL_HOST_DEVICE void
+sequence(const thrust::detail::execution_policy_base<DerivedPolicy>& exec, ForwardIterator first, ForwardIterator last);
 
 /*! \p sequence fills the range <tt>[first, last)</tt> with a sequence of numbers.
  *
- *  For each iterator \c i in the range <tt>[first, last)</tt>, this version of 
+ *  For each iterator \c i in the range <tt>[first, last)</tt>, this version of
  *  \p sequence performs the assignment <tt>*i =  (i - first)</tt>.
  *
  *  \param first The beginning of the sequence.
  *  \param last The end of the sequence.
  *
- *  \tparam ForwardIterator is a model of <a href="https://en.cppreference.com/w/cpp/iterator/forward_iterator">Forward Iterator</a>,
- *          and \p ForwardIterator is mutable,
- *          and if \c x and \c y are objects of \c ForwardIterator's \c value_type, then <tt>x + y</tt> is defined,
- *          and if \c T is \p ForwardIterator's \c value_type, then <tt>T(0)</tt> is defined.
+ *  \tparam ForwardIterator is a model of <a href="https://en.cppreference.com/w/cpp/iterator/forward_iterator">Forward
+ * Iterator</a>, and \p ForwardIterator is mutable, and if \c x and \c y are objects of \c ForwardIterator's \c
+ * value_type, then <tt>x + y</tt> is defined, and if \c T is \p ForwardIterator's \c value_type, then <tt>T(0)</tt> is
+ * defined.
  *
  *  The following code snippet demonstrates how to use \p sequence to fill a range
  *  with a sequence of numbers.
@@ -103,14 +106,12 @@ __host__ __device__
  *
  *  \see https://en.cppreference.com/w/cpp/algorithm/iota
  */
-template<typename ForwardIterator>
-  void sequence(ForwardIterator first,
-                ForwardIterator last);
-
+template <typename ForwardIterator>
+void sequence(ForwardIterator first, ForwardIterator last);
 
 /*! \p sequence fills the range <tt>[first, last)</tt> with a sequence of numbers.
  *
- *  For each iterator \c i in the range <tt>[first, last)</tt>, this version of 
+ *  For each iterator \c i in the range <tt>[first, last)</tt>, this version of
  *  \p sequence performs the assignment <tt>*i =  init + (i - first)</tt>.
  *
  *  The algorithm's execution is parallelized as determined by \p exec.
@@ -121,11 +122,10 @@ template<typename ForwardIterator>
  *  \param init The first value of the sequence of numbers.
  *
  *  \tparam DerivedPolicy The name of the derived execution policy.
- *  \tparam ForwardIterator is a model of <a href="https://en.cppreference.com/w/cpp/iterator/forward_iterator">Forward Iterator</a>,
- *          and \p ForwardIterator is mutable,
- *          and if \c x and \c y are objects of \c ForwardIterator's \c value_type, then <tt>x + y</tt> is defined,
- *          and if \c T is \p ForwardIterator's \c value_type, then <tt>T(0)</tt> is defined.
- *  \tparam T is a model of <a href="https://en.cppreference.com/w/cpp/named_req/CopyAssignable">Assignable</a>,
+ *  \tparam ForwardIterator is a model of <a href="https://en.cppreference.com/w/cpp/iterator/forward_iterator">Forward
+ * Iterator</a>, and \p ForwardIterator is mutable, and if \c x and \c y are objects of \c ForwardIterator's \c
+ * value_type, then <tt>x + y</tt> is defined, and if \c T is \p ForwardIterator's \c value_type, then <tt>T(0)</tt> is
+ * defined. \tparam T is a model of <a href="https://en.cppreference.com/w/cpp/named_req/CopyAssignable">Assignable</a>,
  *          and \p T is convertible to \p ForwardIterator's \c value_type.
  *
  *  The following code snippet demonstrates how to use \p sequence to fill a range
@@ -147,28 +147,23 @@ template<typename ForwardIterator>
  *
  *  \see https://en.cppreference.com/w/cpp/algorithm/iota
  */
-template<typename DerivedPolicy, typename ForwardIterator, typename T>
-__host__ __device__
-  void sequence(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-                ForwardIterator first,
-                ForwardIterator last,
-                T init);
-
+template <typename DerivedPolicy, typename ForwardIterator, typename T>
+_CCCL_HOST_DEVICE void sequence(
+  const thrust::detail::execution_policy_base<DerivedPolicy>& exec, ForwardIterator first, ForwardIterator last, T init);
 
 /*! \p sequence fills the range <tt>[first, last)</tt> with a sequence of numbers.
  *
- *  For each iterator \c i in the range <tt>[first, last)</tt>, this version of 
+ *  For each iterator \c i in the range <tt>[first, last)</tt>, this version of
  *  \p sequence performs the assignment <tt>*i =  init + (i - first)</tt>.
  *
  *  \param first The beginning of the sequence.
  *  \param last The end of the sequence.
  *  \param init The first value of the sequence of numbers.
  *
- *  \tparam ForwardIterator is a model of <a href="https://en.cppreference.com/w/cpp/iterator/forward_iterator">Forward Iterator</a>,
- *          and \p ForwardIterator is mutable,
- *          and if \c x and \c y are objects of \c ForwardIterator's \c value_type, then <tt>x + y</tt> is defined,
- *          and if \c T is \p ForwardIterator's \c value_type, then <tt>T(0)</tt> is defined.
- *  \tparam T is a model of <a href="https://en.cppreference.com/w/cpp/named_req/CopyAssignable">Assignable</a>,
+ *  \tparam ForwardIterator is a model of <a href="https://en.cppreference.com/w/cpp/iterator/forward_iterator">Forward
+ * Iterator</a>, and \p ForwardIterator is mutable, and if \c x and \c y are objects of \c ForwardIterator's \c
+ * value_type, then <tt>x + y</tt> is defined, and if \c T is \p ForwardIterator's \c value_type, then <tt>T(0)</tt> is
+ * defined. \tparam T is a model of <a href="https://en.cppreference.com/w/cpp/named_req/CopyAssignable">Assignable</a>,
  *          and \p T is convertible to \p ForwardIterator's \c value_type.
  *
  *  The following code snippet demonstrates how to use \p sequence to fill a range
@@ -188,15 +183,12 @@ __host__ __device__
  *
  *  \see https://en.cppreference.com/w/cpp/algorithm/iota
  */
-template<typename ForwardIterator, typename T>
-  void sequence(ForwardIterator first,
-                ForwardIterator last,
-                T init);
-
+template <typename ForwardIterator, typename T>
+void sequence(ForwardIterator first, ForwardIterator last, T init);
 
 /*! \p sequence fills the range <tt>[first, last)</tt> with a sequence of numbers.
  *
- *  For each iterator \c i in the range <tt>[first, last)</tt>, this version of 
+ *  For each iterator \c i in the range <tt>[first, last)</tt>, this version of
  *  \p sequence performs the assignment <tt>*i =  init + step * (i - first)</tt>.
  *
  *  The algorithm's execution is parallelized as determined by \p exec.
@@ -208,11 +200,10 @@ template<typename ForwardIterator, typename T>
  *  \param step The difference between consecutive elements.
  *
  *  \tparam DerivedPolicy The name of the derived execution policy.
- *  \tparam ForwardIterator is a model of <a href="https://en.cppreference.com/w/cpp/iterator/forward_iterator">Forward Iterator</a>,
- *          and \p ForwardIterator is mutable,
- *          and if \c x and \c y are objects of \c ForwardIterator's \c value_type, then <tt>x + y</tt> is defined,
- *          and if \c T is \p ForwardIterator's \c value_type, then <tt>T(0)</tt> is defined.
- *  \tparam T is a model of <a href="https://en.cppreference.com/w/cpp/named_req/CopyAssignable">Assignable</a>,
+ *  \tparam ForwardIterator is a model of <a href="https://en.cppreference.com/w/cpp/iterator/forward_iterator">Forward
+ * Iterator</a>, and \p ForwardIterator is mutable, and if \c x and \c y are objects of \c ForwardIterator's \c
+ * value_type, then <tt>x + y</tt> is defined, and if \c T is \p ForwardIterator's \c value_type, then <tt>T(0)</tt> is
+ * defined. \tparam T is a model of <a href="https://en.cppreference.com/w/cpp/named_req/CopyAssignable">Assignable</a>,
  *          and \p T is convertible to \p ForwardIterator's \c value_type.
  *
  *  The following code snippet demonstrates how to use \p sequence to fill a range
@@ -234,18 +225,17 @@ template<typename ForwardIterator, typename T>
  *
  *  \see https://en.cppreference.com/w/cpp/algorithm/iota
  */
-template<typename DerivedPolicy, typename ForwardIterator, typename T>
-__host__ __device__
-  void sequence(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-                ForwardIterator first,
-                ForwardIterator last,
-                T init,
-                T step);
-
+template <typename DerivedPolicy, typename ForwardIterator, typename T>
+_CCCL_HOST_DEVICE void sequence(
+  const thrust::detail::execution_policy_base<DerivedPolicy>& exec,
+  ForwardIterator first,
+  ForwardIterator last,
+  T init,
+  T step);
 
 /*! \p sequence fills the range <tt>[first, last)</tt> with a sequence of numbers.
  *
- *  For each iterator \c i in the range <tt>[first, last)</tt>, this version of 
+ *  For each iterator \c i in the range <tt>[first, last)</tt>, this version of
  *  \p sequence performs the assignment <tt>*i =  init + step * (i - first)</tt>.
  *
  *  \param first The beginning of the sequence.
@@ -253,11 +243,10 @@ __host__ __device__
  *  \param init The first value of the sequence of numbers
  *  \param step The difference between consecutive elements.
  *
- *  \tparam ForwardIterator is a model of <a href="https://en.cppreference.com/w/cpp/iterator/forward_iterator">Forward Iterator</a>,
- *          and \p ForwardIterator is mutable,
- *          and if \c x and \c y are objects of \c ForwardIterator's \c value_type, then <tt>x + y</tt> is defined,
- *          and if \c T is \p ForwardIterator's \c value_type, then <tt>T(0)</tt> is defined.
- *  \tparam T is a model of <a href="https://en.cppreference.com/w/cpp/named_req/CopyAssignable">Assignable</a>,
+ *  \tparam ForwardIterator is a model of <a href="https://en.cppreference.com/w/cpp/iterator/forward_iterator">Forward
+ * Iterator</a>, and \p ForwardIterator is mutable, and if \c x and \c y are objects of \c ForwardIterator's \c
+ * value_type, then <tt>x + y</tt> is defined, and if \c T is \p ForwardIterator's \c value_type, then <tt>T(0)</tt> is
+ * defined. \tparam T is a model of <a href="https://en.cppreference.com/w/cpp/named_req/CopyAssignable">Assignable</a>,
  *          and \p T is convertible to \p ForwardIterator's \c value_type.
  *
  *  The following code snippet demonstrates how to use \p sequence to fill a range
@@ -277,12 +266,8 @@ __host__ __device__
  *
  *  \see https://en.cppreference.com/w/cpp/algorithm/iota
  */
-template<typename ForwardIterator, typename T>
-  void sequence(ForwardIterator first,
-                ForwardIterator last,
-                T init,
-                T step);
-
+template <typename ForwardIterator, typename T>
+void sequence(ForwardIterator first, ForwardIterator last, T init, T step);
 
 /*! \} // end transformations
  */
@@ -290,4 +275,3 @@ template<typename ForwardIterator, typename T>
 THRUST_NAMESPACE_END
 
 #include <thrust/detail/sequence.inl>
-

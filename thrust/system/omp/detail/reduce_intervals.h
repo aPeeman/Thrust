@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file reduce_intervals.h
  *  \brief OpenMP implementations of reduce_intervals algorithms.
  */
@@ -22,6 +21,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/system/omp/detail/execution_policy.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -37,11 +44,12 @@ template <typename DerivedPolicy,
           typename OutputIterator,
           typename BinaryFunction,
           typename Decomposition>
-void reduce_intervals(execution_policy<DerivedPolicy> &exec,
-                      InputIterator input,
-                      OutputIterator output,
-                      BinaryFunction binary_op,
-                      Decomposition decomp);
+void reduce_intervals(
+  execution_policy<DerivedPolicy>& exec,
+  InputIterator input,
+  OutputIterator output,
+  BinaryFunction binary_op,
+  Decomposition decomp);
 
 } // end namespace detail
 } // end namespace omp
@@ -49,4 +57,3 @@ void reduce_intervals(execution_policy<DerivedPolicy> &exec,
 THRUST_NAMESPACE_END
 
 #include <thrust/system/omp/detail/reduce_intervals.inl>
-

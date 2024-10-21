@@ -18,26 +18,31 @@
 
 #include <thrust/detail/config.h>
 
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 #include <thrust/iterator/iterator_adaptor.h>
 #include <thrust/iterator/iterator_traits.h>
 
 THRUST_NAMESPACE_BEGIN
 
-template <typename> class reverse_iterator;
+template <typename>
+class reverse_iterator;
 
 namespace detail
 {
 
-template<typename BidirectionalIterator>
-  struct reverse_iterator_base
+template <typename BidirectionalIterator>
+struct reverse_iterator_base
 {
-  typedef thrust::iterator_adaptor<
-    thrust::reverse_iterator<BidirectionalIterator>,
-    BidirectionalIterator
-  > type;
+  typedef thrust::iterator_adaptor<thrust::reverse_iterator<BidirectionalIterator>, BidirectionalIterator> type;
 }; // end reverse_iterator_base
 
-} // end detail
+} // namespace detail
 
 THRUST_NAMESPACE_END
-

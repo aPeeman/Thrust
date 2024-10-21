@@ -28,29 +28,39 @@
 
 #include <thrust/detail/config.h>
 
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 #include <thrust/detail/seq.h>
 #include <thrust/system/cuda/detail/par.h>
 
 THRUST_NAMESPACE_BEGIN
-namespace cuda_cub {
+namespace cuda_cub
+{
 
 template <int PAR>
-struct has_par : thrust::detail::true_type {};
+struct has_par : thrust::detail::true_type
+{};
 
 template <>
-struct has_par<0> : thrust::detail::false_type {};
+struct has_par<0> : thrust::detail::false_type
+{};
 
-template<class Policy>
+template <class Policy>
 struct cvt_to_seq_impl
 {
   typedef thrust::detail::seq_t seq_t;
 
-  static seq_t __host__ __device__
-  doit(Policy&)
+  static seq_t _CCCL_HOST_DEVICE doit(Policy&)
   {
     return seq_t();
   }
-};    // cvt_to_seq_impl
+}; // cvt_to_seq_impl
 
 #if 0
 template <class Allocator>
@@ -67,7 +77,7 @@ struct cvt_to_seq_impl<
       seq_t;
 
 
-  static seq_t __host__ __device__
+  static seq_t _CCCL_HOST_DEVICE
   doit(Policy& policy)
   {
     return seq_t(policy.m_alloc);
@@ -76,17 +86,10 @@ struct cvt_to_seq_impl<
 #endif
 
 template <class Policy>
-typename cvt_to_seq_impl<Policy>::seq_t __host__ __device__
-cvt_to_seq(Policy& policy)
+typename cvt_to_seq_impl<Policy>::seq_t _CCCL_HOST_DEVICE cvt_to_seq(Policy& policy)
 {
   return cvt_to_seq_impl<Policy>::doit(policy);
 }
 
-#if __THRUST_HAS_CUDART__
-#define THRUST_CUDART_DISPATCH par
-#else
-#define THRUST_CUDART_DISPATCH seq
-#endif
-
-} // namespace cuda_
+} // namespace cuda_cub
 THRUST_NAMESPACE_END

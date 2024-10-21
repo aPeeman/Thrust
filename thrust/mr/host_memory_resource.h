@@ -18,6 +18,14 @@
 
 #include <thrust/detail/config.h>
 
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 // #include the host system's memory_resource header
 #define __THRUST_HOST_SYSTEM_MEMORY_HEADER <__THRUST_HOST_SYSTEM_ROOT/memory_resource.h>
 #include __THRUST_HOST_SYSTEM_MEMORY_HEADER
@@ -25,8 +33,6 @@
 
 THRUST_NAMESPACE_BEGIN
 
-typedef thrust::system::__THRUST_HOST_SYSTEM_NAMESPACE::memory_resource
-    host_memory_resource;
+typedef thrust::system::__THRUST_HOST_SYSTEM_NAMESPACE::memory_resource host_memory_resource;
 
 THRUST_NAMESPACE_END
-

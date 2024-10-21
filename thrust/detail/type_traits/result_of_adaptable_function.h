@@ -17,6 +17,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/type_traits.h>
 #include <thrust/detail/type_traits/function_traits.h>
 
@@ -29,33 +37,27 @@ namespace detail
 // Sets `type` to the result of the specified Signature invocation. If the
 // callable defines a `result_type` alias member, that type is used instead.
 // Use invoke_result / result_of when FuncType::result_type is not defined.
-#if THRUST_CPP_DIALECT >= 2017
 template <typename Signature, typename Enable = void>
 struct result_of_adaptable_function
 {
 private:
-  template <typename Sig> struct impl;
+  template <typename Sig>
+  struct impl;
 
-  template <typename F, typename...Args>
+  template <typename F, typename... Args>
   struct impl<F(Args...)>
   {
-    using type = std::invoke_result_t<F, Args...>;
+    using type = invoke_result_t<F, Args...>;
   };
 
 public:
   using type = typename impl<Signature>::type;
 };
-#else // < C++17
-template <typename Signature, typename Enable = void>
-struct result_of_adaptable_function : std::result_of<Signature> {};
-#endif // < C++17
 
 // specialization for invocations which define result_type
 template <typename Functor, typename... ArgTypes>
-struct result_of_adaptable_function<
-  Functor(ArgTypes...),
-  typename thrust::detail::enable_if<
-    thrust::detail::has_result_type<Functor>::value>::type>
+struct result_of_adaptable_function<Functor(ArgTypes...),
+                                    ::cuda::std::__enable_if_t<thrust::detail::has_result_type<Functor>::value>>
 {
   using type = typename Functor::result_type;
 };

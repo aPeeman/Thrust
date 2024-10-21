@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file system/system_error.h
  *  \brief An exception object used to report error conditions that have an
  *         associated error code
@@ -23,10 +22,18 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+#include <thrust/system/error_code.h>
+
 #include <stdexcept>
 #include <string>
-
-#include <thrust/system/error_code.h>
 
 THRUST_NAMESPACE_BEGIN
 
@@ -58,13 +65,13 @@ namespace system
  *  #include <thrust/system.h>
  *  #include <thrust/sort.h>
  *
- *  void terminate_gracefully(void)
+ *  void terminate_gracefully()
  *  {
  *    // application-specific termination code here
  *    ...
  *  }
  *
- *  int main(void)
+ *  int main()
  *  {
  *    try
  *    {
@@ -85,86 +92,86 @@ namespace system
  *  \note If an error represents an out-of-memory condition, implementations are encouraged
  *  to throw an exception object of type \p std::bad_alloc rather than \p system_error.
  */
-class system_error
-  : public std::runtime_error
+class system_error : public std::runtime_error
 {
-  public:
-    // [19.5.5.2] Class system_error members
-    
-    /*! Constructs an object of class \p system_error.
-     *  \param ec The value returned by \p code().
-     *  \param what_arg A string to include in the result returned by \p what().
-     *  \post <tt>code() == ec</tt>.
-     *  \post <tt>std::string(what()).find(what_arg) != string::npos</tt>.
-     */
-    inline system_error(error_code ec, const std::string &what_arg);
+public:
+  // [19.5.5.2] Class system_error members
 
-    /*! Constructs an object of class \p system_error.
-     *  \param ec The value returned by \p code().
-     *  \param what_arg A string to include in the result returned by \p what().
-     *  \post <tt>code() == ec</tt>.
-     *  \post <tt>std::string(what()).find(what_arg) != string::npos</tt>.
-     */
-    inline system_error(error_code ec, const char *what_arg);
+  /*! Constructs an object of class \p system_error.
+   *  \param ec The value returned by \p code().
+   *  \param what_arg A string to include in the result returned by \p what().
+   *  \post <tt>code() == ec</tt>.
+   *  \post <tt>std::string(what()).find(what_arg) != string::npos</tt>.
+   */
+  inline system_error(error_code ec, const std::string& what_arg);
 
-    /*! Constructs an object of class \p system_error.
-     *  \param ec The value returned by \p code().
-     *  \post <tt>code() == ec</tt>.
-     */
-    inline system_error(error_code ec);
+  /*! Constructs an object of class \p system_error.
+   *  \param ec The value returned by \p code().
+   *  \param what_arg A string to include in the result returned by \p what().
+   *  \post <tt>code() == ec</tt>.
+   *  \post <tt>std::string(what()).find(what_arg) != string::npos</tt>.
+   */
+  inline system_error(error_code ec, const char* what_arg);
 
-    /*! Constructs an object of class \p system_error.
-     *  \param ev The error value used to create an \p error_code.
-     *  \param ecat The \p error_category used to create an \p error_code.
-     *  \param what_arg A string to include in the result returned by \p what().
-     *  \post <tt>code() == error_code(ev, ecat)</tt>.
-     *  \post <tt>std::string(what()).find(what_arg) != string::npos</tt>.
-     */
-    inline system_error(int ev, const error_category &ecat, const std::string &what_arg);
+  /*! Constructs an object of class \p system_error.
+   *  \param ec The value returned by \p code().
+   *  \post <tt>code() == ec</tt>.
+   */
+  inline system_error(error_code ec);
 
-    /*! Constructs an object of class \p system_error.
-     *  \param ev The error value used to create an \p error_code.
-     *  \param ecat The \p error_category used to create an \p error_code.
-     *  \param what_arg A string to include in the result returned by \p what().
-     *  \post <tt>code() == error_code(ev, ecat)</tt>.
-     *  \post <tt>std::string(what()).find(what_arg) != string::npos</tt>.
-     */
-    inline system_error(int ev, const error_category &ecat, const char *what_arg);
+  /*! Constructs an object of class \p system_error.
+   *  \param ev The error value used to create an \p error_code.
+   *  \param ecat The \p error_category used to create an \p error_code.
+   *  \param what_arg A string to include in the result returned by \p what().
+   *  \post <tt>code() == error_code(ev, ecat)</tt>.
+   *  \post <tt>std::string(what()).find(what_arg) != string::npos</tt>.
+   */
+  inline system_error(int ev, const error_category& ecat, const std::string& what_arg);
 
-    /*! Constructs an object of class \p system_error.
-     *  \param ev The error value used to create an \p error_code.
-     *  \param ecat The \p error_category used to create an \p error_code.
-     *  \post <tt>code() == error_code(ev, ecat)</tt>.
-     */
-    inline system_error(int ev, const error_category &ecat);
+  /*! Constructs an object of class \p system_error.
+   *  \param ev The error value used to create an \p error_code.
+   *  \param ecat The \p error_category used to create an \p error_code.
+   *  \param what_arg A string to include in the result returned by \p what().
+   *  \post <tt>code() == error_code(ev, ecat)</tt>.
+   *  \post <tt>std::string(what()).find(what_arg) != string::npos</tt>.
+   */
+  inline system_error(int ev, const error_category& ecat, const char* what_arg);
 
-    /*! Destructor does not throw.
-     */
-    inline virtual ~system_error(void) throw () {};
-    
-    /*! Returns an object encoding the error.
-     *  \return <tt>ec</tt> or <tt>error_code(ev, ecat)</tt>, from the
-     *          constructor, as appropriate.
-     */
-    inline const error_code &code(void) const throw();
+  /*! Constructs an object of class \p system_error.
+   *  \param ev The error value used to create an \p error_code.
+   *  \param ecat The \p error_category used to create an \p error_code.
+   *  \post <tt>code() == error_code(ev, ecat)</tt>.
+   */
+  inline system_error(int ev, const error_category& ecat);
 
-    /*! Returns a human-readable string indicating the nature of the error.
-     *  \return a string incorporating <tt>code().message()</tt> and the
-     *          arguments supplied in the constructor.
-     */
-    inline const char *what(void) const throw();
+  /*! Destructor does not throw.
+   */
+  inline virtual ~system_error() noexcept {};
 
-    /*! \cond
-     */
-  private:
-    error_code          m_error_code;
-    mutable std::string m_what;
+  /*! Returns an object encoding the error.
+   *  \return <tt>ec</tt> or <tt>error_code(ev, ecat)</tt>, from the
+   *          constructor, as appropriate.
+   */
+  inline const error_code& code() const noexcept;
 
-    /*! \endcond
-     */
+  /*! Returns a human-readable string indicating the nature of the error.
+   *  \return a string incorporating <tt>code().message()</tt> and the
+   *          arguments supplied in the constructor.
+   */
+  inline const char* what() const noexcept;
+
+  /*! \cond
+   */
+
+private:
+  error_code m_error_code;
+  mutable std::string m_what;
+
+  /*! \endcond
+   */
 }; // end system_error
 
-} // end system
+} // namespace system
 
 /*! \} // end system_diagnostics
  */
@@ -175,4 +182,3 @@ using system::system_error;
 THRUST_NAMESPACE_END
 
 #include <thrust/system/detail/system_error.inl>
-

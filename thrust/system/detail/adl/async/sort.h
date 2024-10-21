@@ -22,13 +22,20 @@
 
 #include <thrust/detail/config.h>
 
-//#include <thrust/system/detail/sequential/async/sort.h>
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 
-//#define __THRUST_HOST_SYSTEM_ASYNC_SORT_HEADER <__THRUST_HOST_SYSTEM_ROOT/detail/async/sort.h>
-//#include __THRUST_HOST_SYSTEM_ASYNC_SORT_HEADER
-//#undef __THRUST_HOST_SYSTEM_ASYNC_SORT_HEADER
+// #include <thrust/system/detail/sequential/async/sort.h>
+
+// #define __THRUST_HOST_SYSTEM_ASYNC_SORT_HEADER <__THRUST_HOST_SYSTEM_ROOT/detail/async/sort.h>
+// #include __THRUST_HOST_SYSTEM_ASYNC_SORT_HEADER
+// #undef __THRUST_HOST_SYSTEM_ASYNC_SORT_HEADER
 
 #define __THRUST_DEVICE_SYSTEM_ASYNC_SORT_HEADER <__THRUST_DEVICE_SYSTEM_ROOT/detail/async/sort.h>
 #include __THRUST_DEVICE_SYSTEM_ASYNC_SORT_HEADER
 #undef __THRUST_DEVICE_SYSTEM_ASYNC_SORT_HEADER
-

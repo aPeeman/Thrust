@@ -28,67 +28,63 @@
 
 #include <thrust/detail/config.h>
 
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 #if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
-#include <thrust/system/cuda/detail/util.h>
-#include <thrust/system/cuda/detail/parallel_for.h>
-#include <thrust/distance.h>
+#  include <thrust/distance.h>
+#  include <thrust/system/cuda/detail/parallel_for.h>
+#  include <thrust/system/cuda/detail/util.h>
 
 THRUST_NAMESPACE_BEGIN
-namespace cuda_cub {
+namespace cuda_cub
+{
 
-namespace __fill {
+namespace __fill
+{
 
-  // fill functor
-  template<class Iterator, class T>
-  struct functor
+// fill functor
+template <class Iterator, class T>
+struct functor
+{
+  Iterator it;
+  T value;
+
+  THRUST_FUNCTION
+  functor(Iterator it, T value)
+      : it(it)
+      , value(value)
+  {}
+
+  template <class Size>
+  THRUST_DEVICE_FUNCTION void operator()(Size idx)
   {
-    Iterator it;
-    T value;
+    it[idx] = value;
+  }
+}; // struct functor
 
-    THRUST_FUNCTION
-    functor(Iterator it, T value)
-        : it(it), value(value) {}
-
-    template<class Size>
-    THRUST_DEVICE_FUNCTION void operator()(Size idx)
-    {
-      it[idx] = value;
-    }
-  }; // struct functor
-
-}    // namespace __fill
+} // namespace __fill
 
 template <class Derived, class OutputIterator, class Size, class T>
-OutputIterator __host__ __device__
-fill_n(execution_policy<Derived>& policy,
-       OutputIterator             first,
-       Size                       count,
-       const T&                   value)
+OutputIterator _CCCL_HOST_DEVICE
+fill_n(execution_policy<Derived>& policy, OutputIterator first, Size count, const T& value)
 {
-  cuda_cub::parallel_for(policy,
-                         __fill::functor<OutputIterator, T>(
-                         first,
-                         value),
-                         count);
-
-  cuda_cub::throw_on_error(
-    cuda_cub::synchronize(policy)
-  , "fill_n: failed to synchronize"
-  );
+  cuda_cub::parallel_for(policy, __fill::functor<OutputIterator, T>(first, value), count);
 
   return first + count;
-}    // func fill_n
+} // func fill_n
 
 template <class Derived, class ForwardIterator, class T>
-void __host__ __device__
-fill(execution_policy<Derived>& policy,
-     ForwardIterator            first,
-     ForwardIterator            last,
-     const T&                   value)
+void _CCCL_HOST_DEVICE
+fill(execution_policy<Derived>& policy, ForwardIterator first, ForwardIterator last, const T& value)
 {
-  cuda_cub::fill_n(policy, first, thrust::distance(first,last), value);
+  cuda_cub::fill_n(policy, first, thrust::distance(first, last), value);
 } // func filll
-
 
 } // namespace cuda_cub
 THRUST_NAMESPACE_END

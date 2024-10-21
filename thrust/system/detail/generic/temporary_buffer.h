@@ -17,9 +17,17 @@
 #pragma once
 
 #include <thrust/detail/config.h>
-#include <thrust/system/detail/generic/tag.h>
-#include <thrust/pair.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/pointer.h>
+#include <thrust/pair.h>
+#include <thrust/system/detail/generic/tag.h>
 
 THRUST_NAMESPACE_BEGIN
 namespace system
@@ -29,29 +37,24 @@ namespace detail
 namespace generic
 {
 
+template <typename T, typename DerivedPolicy>
+_CCCL_HOST_DEVICE
+  thrust::pair<thrust::pointer<T, DerivedPolicy>, typename thrust::pointer<T, DerivedPolicy>::difference_type>
+  get_temporary_buffer(thrust::execution_policy<DerivedPolicy>& exec,
+                       typename thrust::pointer<T, DerivedPolicy>::difference_type n);
 
-template<typename T, typename DerivedPolicy>
-__host__ __device__
-  thrust::pair<thrust::pointer<T,DerivedPolicy>, typename thrust::pointer<T,DerivedPolicy>::difference_type>
-    get_temporary_buffer(thrust::execution_policy<DerivedPolicy> &exec, typename thrust::pointer<T,DerivedPolicy>::difference_type n);
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy, typename Pointer>
+_CCCL_HOST_DEVICE void
+return_temporary_buffer(thrust::execution_policy<DerivedPolicy>& exec, Pointer p, std::ptrdiff_t n);
 
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy, typename Pointer>
+_CCCL_HOST_DEVICE void return_temporary_buffer(thrust::execution_policy<DerivedPolicy>& exec, Pointer p);
 
-__thrust_exec_check_disable__
-template<typename DerivedPolicy, typename Pointer>
-__host__ __device__
-  void return_temporary_buffer(thrust::execution_policy<DerivedPolicy> &exec, Pointer p, std::ptrdiff_t n);
-
-
-__thrust_exec_check_disable__
-template<typename DerivedPolicy, typename Pointer>
-__host__ __device__
-  void return_temporary_buffer(thrust::execution_policy<DerivedPolicy> &exec, Pointer p);
-
-
-} // end generic
-} // end detail
-} // end system
+} // namespace generic
+} // namespace detail
+} // namespace system
 THRUST_NAMESPACE_END
 
 #include <thrust/system/detail/generic/temporary_buffer.inl>
-

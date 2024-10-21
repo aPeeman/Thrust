@@ -14,16 +14,21 @@
  *  limitations under the License.
  */
 
-
-/*! \file device_malloc.inl
- *  \brief Inline file for device_malloc.h.
- */
+#pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+#include <thrust/detail/malloc_and_free.h>
 #include <thrust/device_malloc.h>
 #include <thrust/iterator/iterator_traits.h>
 #include <thrust/system/detail/generic/select_system.h>
-#include <thrust/detail/malloc_and_free.h>
 
 THRUST_NAMESPACE_BEGIN
 
@@ -31,7 +36,7 @@ thrust::device_ptr<void> device_malloc(const std::size_t n)
 {
   using thrust::system::detail::generic::select_system;
 
-  typedef thrust::iterator_system< thrust::device_ptr<void> >::type system;
+  typedef thrust::iterator_system<thrust::device_ptr<void>>::type system;
 
   // XXX lower to select_system(system) here
   system s;
@@ -39,18 +44,17 @@ thrust::device_ptr<void> device_malloc(const std::size_t n)
   return thrust::device_ptr<void>(thrust::malloc(s, n).get());
 } // end device_malloc()
 
-
-template<typename T>
-  thrust::device_ptr<T> device_malloc(const std::size_t n)
+template <typename T>
+thrust::device_ptr<T> device_malloc(const std::size_t n)
 {
   using thrust::system::detail::generic::select_system;
 
-  typedef thrust::iterator_system< thrust::device_ptr<void> >::type system;
+  typedef thrust::iterator_system<thrust::device_ptr<void>>::type system;
 
   // XXX lower to select_system(system) here
   system s;
 
-  return thrust::device_ptr<T>(thrust::malloc<T>(s,n).get());
+  return thrust::device_ptr<T>(thrust::malloc<T>(s, n).get());
 } // end device_malloc()
 
 THRUST_NAMESPACE_END

@@ -14,13 +14,23 @@
  *  limitations under the License.
  */
 
+#pragma once
+
 #include <thrust/detail/config.h>
-#include <thrust/detail/type_traits.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/allocator/allocator_traits.h>
+#include <thrust/detail/memory_wrapper.h>
+#include <thrust/detail/type_traits.h>
 #include <thrust/detail/type_traits/pointer_traits.h>
 #include <thrust/for_each.h>
 #include <thrust/uninitialized_fill.h>
-#include <thrust/detail/memory_wrapper.h>
 
 THRUST_NAMESPACE_BEGIN
 namespace detail
@@ -34,79 +44,56 @@ namespace allocator_traits_detail
 // else
 //   2. construct via uninitialized_fill
 
-template<typename Allocator, typename T, typename Arg1>
-  struct has_effectful_member_construct2
-    : has_member_construct2<Allocator,T,Arg1>
+template <typename Allocator, typename T, typename Arg1>
+struct has_effectful_member_construct2 : has_member_construct2<Allocator, T, Arg1>
 {};
 
 // std::allocator::construct's only effect is to invoke placement new
-template<typename U, typename T, typename Arg1>
-  struct has_effectful_member_construct2<std::allocator<U>,T,Arg1>
-    : thrust::detail::false_type
+template <typename U, typename T, typename Arg1>
+struct has_effectful_member_construct2<std::allocator<U>, T, Arg1> : thrust::detail::false_type
 {};
 
-
-template<typename Allocator, typename Arg1>
-  struct construct2_via_allocator
+template <typename Allocator, typename Arg1>
+struct construct2_via_allocator
 {
-  Allocator &a;
+  Allocator& a;
   Arg1 arg;
 
-  __host__ __device__
-  construct2_via_allocator(Allocator &a, const Arg1 &arg)
-    : a(a), arg(arg)
+  _CCCL_HOST_DEVICE construct2_via_allocator(Allocator& a, const Arg1& arg)
+      : a(a)
+      , arg(arg)
   {}
 
-  template<typename T>
-  inline __host__ __device__
-  void operator()(T &x)
+  template <typename T>
+  inline _CCCL_HOST_DEVICE void operator()(T& x)
   {
     allocator_traits<Allocator>::construct(a, &x, arg);
   }
 };
 
-
-template<typename Allocator, typename Pointer, typename Size, typename T>
-__host__ __device__
-  typename enable_if<
-    has_effectful_member_construct2<
-      Allocator,
-      typename pointer_element<Pointer>::type,
-      T
-    >::value
-  >::type
-    fill_construct_range(Allocator &a, Pointer p, Size n, const T &value)
+template <typename Allocator, typename Pointer, typename Size, typename T>
+_CCCL_HOST_DEVICE ::cuda::std::__enable_if_t<
+  has_effectful_member_construct2<Allocator, typename pointer_element<Pointer>::type, T>::value>
+fill_construct_range(Allocator& a, Pointer p, Size n, const T& value)
 {
-  thrust::for_each_n(allocator_system<Allocator>::get(a), p, n, construct2_via_allocator<Allocator,T>(a, value));
+  thrust::for_each_n(allocator_system<Allocator>::get(a), p, n, construct2_via_allocator<Allocator, T>(a, value));
 }
 
-
-template<typename Allocator, typename Pointer, typename Size, typename T>
-__host__ __device__
-  typename disable_if<
-    has_effectful_member_construct2<
-      Allocator,
-      typename pointer_element<Pointer>::type,
-      T
-    >::value
-  >::type
-    fill_construct_range(Allocator &a, Pointer p, Size n, const T &value)
+template <typename Allocator, typename Pointer, typename Size, typename T>
+_CCCL_HOST_DEVICE ::cuda::std::__enable_if_t<
+  !has_effectful_member_construct2<Allocator, typename pointer_element<Pointer>::type, T>::value>
+fill_construct_range(Allocator& a, Pointer p, Size n, const T& value)
 {
   thrust::uninitialized_fill_n(allocator_system<Allocator>::get(a), p, n, value);
 }
 
+} // namespace allocator_traits_detail
 
-} // end allocator_traits_detail
-
-
-template<typename Alloc, typename Pointer, typename Size, typename T>
-__host__ __device__
-  void fill_construct_range(Alloc &a, Pointer p, Size n, const T &value)
+template <typename Alloc, typename Pointer, typename Size, typename T>
+_CCCL_HOST_DEVICE void fill_construct_range(Alloc& a, Pointer p, Size n, const T& value)
 {
-  return allocator_traits_detail::fill_construct_range(a,p,n,value);
+  return allocator_traits_detail::fill_construct_range(a, p, n, value);
 }
 
-
-} // end detail
+} // namespace detail
 THRUST_NAMESPACE_END
-

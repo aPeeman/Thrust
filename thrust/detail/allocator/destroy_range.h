@@ -18,16 +18,22 @@
 
 #include <thrust/detail/config.h>
 
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 THRUST_NAMESPACE_BEGIN
 namespace detail
 {
 
-template<typename Allocator, typename Pointer, typename Size>
-__host__ __device__
-  inline void destroy_range(Allocator &a, Pointer p, Size n);
+template <typename Allocator, typename Pointer, typename Size>
+_CCCL_HOST_DEVICE inline void destroy_range(Allocator& a, Pointer p, Size n);
 
-} // end detail
+} // namespace detail
 THRUST_NAMESPACE_END
 
 #include <thrust/detail/allocator/destroy_range.inl>
-

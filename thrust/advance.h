@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file advance.h
  *  \brief Advance an iterator by a given distance.
  */
@@ -22,6 +21,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 
 THRUST_NAMESPACE_BEGIN
 
@@ -37,8 +44,8 @@ THRUST_NAMESPACE_BEGIN
  *  \param i The iterator to be advanced.
  *  \param n The distance by which to advance the iterator.
  *
- *  \tparam InputIterator is a model of <a href="https://en.cppreference.com/w/cpp/iterator/input_iterator">Input Iterator</a>.
- *  \tparam Distance is an integral type that is convertible to \p InputIterator's distance type.
+ *  \tparam InputIterator is a model of <a href="https://en.cppreference.com/w/cpp/iterator/input_iterator">Input
+ * Iterator</a>. \tparam Distance is an integral type that is convertible to \p InputIterator's distance type.
  *
  *  \pre \p n shall be negative only for bidirectional and random access iterators.
  *
@@ -60,15 +67,15 @@ THRUST_NAMESPACE_BEGIN
  *  \see https://en.cppreference.com/w/cpp/iterator/advance
  */
 template <typename InputIterator, typename Distance>
-__host__ __device__
-void advance(InputIterator& i, Distance n);
+_CCCL_HOST_DEVICE void advance(InputIterator& i, Distance n);
 
 /*! \p next(i, n) returns the \p n th successor of the iterator \p i.
  *
  *  \param i An iterator.
  *  \param n The number of elements to advance.
  *
- *  \tparam InputIterator must meet the <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">InputIterator</a>.
+ *  \tparam InputIterator must meet the <a
+ * href="https://en.cppreference.com/w/cpp/named_req/InputIterator">InputIterator</a>.
  *
  *  \pre \p n shall be negative only for bidirectional and random access iterators.
  *
@@ -91,7 +98,7 @@ void advance(InputIterator& i, Distance n);
  */
 #if 0 // Doxygen only
 template <typename InputIterator, typename Distance>
-__host__ __device__
+_CCCL_HOST_DEVICE
 InputIterator next(
   InputIterator i
 , typename iterator_traits<InputIterator>::difference_type n = 1
@@ -103,7 +110,8 @@ InputIterator next(
  *  \param i An iterator.
  *  \param n The number of elements to descend.
  *
- *  \tparam BidirectionalIterator must meet the <a href="https://en.cppreference.com/w/cpp/named_req/BidirectionalIterator">BidirectionalIterator</a>.
+ *  \tparam BidirectionalIterator must meet the <a
+ * href="https://en.cppreference.com/w/cpp/named_req/BidirectionalIterator">BidirectionalIterator</a>.
  *
  *  The following code snippet demonstrates how to use \p prev.
  *
@@ -124,7 +132,7 @@ InputIterator next(
  */
 #if 0 // Doxygen only
 template <typename BidirectionalIterator, typename Distance>
-__host__ __device__
+_CCCL_HOST_DEVICE
 BidirectionalIterator prev(
   BidirectionalIterator i
 , typename iterator_traits<BidirectionalIterator>::difference_type n = 1
@@ -137,4 +145,3 @@ BidirectionalIterator prev(
 THRUST_NAMESPACE_END
 
 #include <thrust/detail/advance.inl>
-

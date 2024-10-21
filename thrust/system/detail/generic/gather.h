@@ -14,10 +14,17 @@
  *  limitations under the License.
  */
 
-
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/system/detail/generic/tag.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -28,48 +35,41 @@ namespace detail
 namespace generic
 {
 
+template <typename DerivedPolicy, typename InputIterator, typename RandomAccessIterator, typename OutputIterator>
+_CCCL_HOST_DEVICE OutputIterator gather(
+  thrust::execution_policy<DerivedPolicy>& exec,
+  InputIterator map_first,
+  InputIterator map_last,
+  RandomAccessIterator input_first,
+  OutputIterator result);
 
-template<typename DerivedPolicy,
-         typename InputIterator,
-         typename RandomAccessIterator,
-         typename OutputIterator>
-__host__ __device__
-  OutputIterator gather(thrust::execution_policy<DerivedPolicy> &exec,
-                        InputIterator                            map_first,
-                        InputIterator                            map_last,
-                        RandomAccessIterator                     input_first,
-                        OutputIterator                           result);
+template <typename DerivedPolicy,
+          typename InputIterator1,
+          typename InputIterator2,
+          typename RandomAccessIterator,
+          typename OutputIterator>
+_CCCL_HOST_DEVICE OutputIterator gather_if(
+  thrust::execution_policy<DerivedPolicy>& exec,
+  InputIterator1 map_first,
+  InputIterator1 map_last,
+  InputIterator2 stencil,
+  RandomAccessIterator input_first,
+  OutputIterator result);
 
-
-template<typename DerivedPolicy,
-         typename InputIterator1,
-         typename InputIterator2,
-         typename RandomAccessIterator,
-         typename OutputIterator>
-__host__ __device__
-  OutputIterator gather_if(thrust::execution_policy<DerivedPolicy> &exec,
-                           InputIterator1                           map_first,
-                           InputIterator1                           map_last,
-                           InputIterator2                           stencil,
-                           RandomAccessIterator                     input_first,
-                           OutputIterator                           result);
-
-
-template<typename DerivedPolicy,
-         typename InputIterator1,
-         typename InputIterator2,
-         typename RandomAccessIterator,
-         typename OutputIterator,
-         typename Predicate>
-__host__ __device__
-  OutputIterator gather_if(thrust::execution_policy<DerivedPolicy> &exec,
-                           InputIterator1                           map_first,
-                           InputIterator1                           map_last,
-                           InputIterator2                           stencil,
-                           RandomAccessIterator                     input_first,
-                           OutputIterator                           result,
-                           Predicate                                pred);
-
+template <typename DerivedPolicy,
+          typename InputIterator1,
+          typename InputIterator2,
+          typename RandomAccessIterator,
+          typename OutputIterator,
+          typename Predicate>
+_CCCL_HOST_DEVICE OutputIterator gather_if(
+  thrust::execution_policy<DerivedPolicy>& exec,
+  InputIterator1 map_first,
+  InputIterator1 map_last,
+  InputIterator2 stencil,
+  RandomAccessIterator input_first,
+  OutputIterator result,
+  Predicate pred);
 
 } // end namespace generic
 } // end namespace detail
@@ -77,4 +77,3 @@ __host__ __device__
 THRUST_NAMESPACE_END
 
 #include <thrust/system/detail/generic/gather.inl>
-

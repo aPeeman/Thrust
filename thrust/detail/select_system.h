@@ -17,13 +17,18 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/cpp11_required.h>
-
-#if THRUST_CPP_DIALECT >= 2011
-
 #include <thrust/detail/type_deduction.h>
-#include <thrust/type_traits/remove_cvref.h>
 #include <thrust/system/detail/generic/select_system.h>
+#include <thrust/type_traits/remove_cvref.h>
 
 THRUST_NAMESPACE_BEGIN
 
@@ -45,40 +50,23 @@ using thrust::system::detail::generic::select_system;
 
 struct select_system_fn final
 {
-  __thrust_exec_check_disable__
+  _CCCL_EXEC_CHECK_DISABLE
   template <typename DerivedPolicy0>
-  __host__ __device__
-  auto operator()(
-    thrust::detail::execution_policy_base<DerivedPolicy0> const& exec0
-  ) const
-  THRUST_DECLTYPE_RETURNS(
-    select_system(
-      thrust::detail::derived_cast(thrust::detail::strip_const(exec0))
-    )
-  )
+  _CCCL_HOST_DEVICE auto operator()(thrust::detail::execution_policy_base<DerivedPolicy0> const& exec0) const
+    THRUST_DECLTYPE_RETURNS(select_system(thrust::detail::derived_cast(thrust::detail::strip_const(exec0))))
 
-  __thrust_exec_check_disable__
+      _CCCL_EXEC_CHECK_DISABLE
   template <typename DerivedPolicy0, typename DerivedPolicy1>
-  __host__ __device__
-  auto operator()(
-    thrust::detail::execution_policy_base<DerivedPolicy0> const& exec0
-  , thrust::detail::execution_policy_base<DerivedPolicy1> const& exec1
-  ) const
-  THRUST_DECLTYPE_RETURNS(
-    select_system(
-      thrust::detail::derived_cast(thrust::detail::strip_const(exec0))
-    , thrust::detail::derived_cast(thrust::detail::strip_const(exec1))
-    )
-  )
+  _CCCL_HOST_DEVICE auto operator()(thrust::detail::execution_policy_base<DerivedPolicy0> const& exec0,
+                                    thrust::detail::execution_policy_base<DerivedPolicy1> const& exec1) const
+    THRUST_DECLTYPE_RETURNS(select_system(thrust::detail::derived_cast(thrust::detail::strip_const(exec0)),
+                                          thrust::detail::derived_cast(thrust::detail::strip_const(exec1))))
 };
 
 } // namespace select_system_detail
 
 THRUST_INLINE_CONSTANT select_system_detail::select_system_fn select_system{};
 
-} // detail
+} // namespace detail
 
 THRUST_NAMESPACE_END
-
-#endif // THRUST_CPP_DIALECT >= 2011
-

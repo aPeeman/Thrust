@@ -14,10 +14,22 @@
  *  limitations under the License.
  */
 
+#pragma once
+
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+#include <thrust/detail/temporary_array.h>
+#include <thrust/distance.h>
 #include <thrust/iterator/iterator_traits.h>
-#include <thrust/system/omp/detail/reduce.h>
 #include <thrust/system/omp/detail/default_decomposition.h>
+#include <thrust/system/omp/detail/reduce.h>
 #include <thrust/system/omp/detail/reduce_intervals.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -28,32 +40,29 @@ namespace omp
 namespace detail
 {
 
-
-template<typename DerivedPolicy,
-         typename InputIterator, 
-         typename OutputType,
-         typename BinaryFunction>
-  OutputType reduce(execution_policy<DerivedPolicy> &exec,
-                    InputIterator first,
-                    InputIterator last,
-                    OutputType init,
-                    BinaryFunction binary_op)
+template <typename DerivedPolicy, typename InputIterator, typename OutputType, typename BinaryFunction>
+OutputType reduce(execution_policy<DerivedPolicy>& exec,
+                  InputIterator first,
+                  InputIterator last,
+                  OutputType init,
+                  BinaryFunction binary_op)
 {
   typedef typename thrust::iterator_difference<InputIterator>::type difference_type;
 
-  const difference_type n = thrust::distance(first,last);
+  const difference_type n = thrust::distance(first, last);
 
   // determine first and second level decomposition
-  thrust::system::detail::internal::uniform_decomposition<difference_type> decomp1 = thrust::system::omp::detail::default_decomposition(n);
+  thrust::system::detail::internal::uniform_decomposition<difference_type> decomp1 =
+    thrust::system::omp::detail::default_decomposition(n);
   thrust::system::detail::internal::uniform_decomposition<difference_type> decomp2(decomp1.size() + 1, 1, 1);
 
   // allocate storage for the initializer and partial sums
   // XXX use select_system for Tag
-  thrust::detail::temporary_array<OutputType,DerivedPolicy> partial_sums(exec, decomp1.size() + 1);
-  
+  thrust::detail::temporary_array<OutputType, DerivedPolicy> partial_sums(exec, decomp1.size() + 1);
+
   // set first element of temp array to init
   partial_sums[0] = init;
-  
+
   // accumulate partial sums (first level reduction)
   thrust::system::omp::detail::reduce_intervals(exec, first, partial_sums.begin() + 1, binary_op, decomp1);
 
@@ -63,9 +72,7 @@ template<typename DerivedPolicy,
   return partial_sums[0];
 } // end reduce()
 
-
-} // end detail
-} // end omp
-} // end system
+} // namespace detail
+} // namespace omp
+} // namespace system
 THRUST_NAMESPACE_END
-

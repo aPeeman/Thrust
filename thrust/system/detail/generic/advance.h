@@ -14,10 +14,17 @@
  *  limitations under the License.
  */
 
-
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 
 THRUST_NAMESPACE_BEGIN
 namespace system
@@ -27,9 +34,8 @@ namespace detail
 namespace generic
 {
 
-template<typename InputIterator, typename Distance>
-__host__ __device__
-void advance(InputIterator& i, Distance n);
+template <typename InputIterator, typename Distance>
+_CCCL_HOST_DEVICE void advance(InputIterator& i, Distance n);
 
 } // end namespace generic
 } // end namespace detail
@@ -37,4 +43,3 @@ void advance(InputIterator& i, Distance n);
 THRUST_NAMESPACE_END
 
 #include <thrust/system/detail/generic/advance.inl>
-

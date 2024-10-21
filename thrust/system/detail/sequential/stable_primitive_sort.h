@@ -17,6 +17,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/system/detail/sequential/execution_policy.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -27,24 +35,16 @@ namespace detail
 namespace sequential
 {
 
+template <typename DerivedPolicy, typename RandomAccessIterator>
+_CCCL_HOST_DEVICE void stable_primitive_sort(
+  sequential::execution_policy<DerivedPolicy>& exec, RandomAccessIterator first, RandomAccessIterator last);
 
-template<typename DerivedPolicy,
-         typename RandomAccessIterator>
-__host__ __device__
-void stable_primitive_sort(sequential::execution_policy<DerivedPolicy> &exec,
-                           RandomAccessIterator first,
-                           RandomAccessIterator last);
-
-
-template<typename DerivedPolicy,
-         typename RandomAccessIterator1,
-         typename RandomAccessIterator2>
-__host__ __device__
-void stable_primitive_sort_by_key(sequential::execution_policy<DerivedPolicy> &exec,
-                                  RandomAccessIterator1 keys_first,
-                                  RandomAccessIterator1 keys_last,
-                                  RandomAccessIterator2 values_first);
-
+template <typename DerivedPolicy, typename RandomAccessIterator1, typename RandomAccessIterator2>
+_CCCL_HOST_DEVICE void stable_primitive_sort_by_key(
+  sequential::execution_policy<DerivedPolicy>& exec,
+  RandomAccessIterator1 keys_first,
+  RandomAccessIterator1 keys_last,
+  RandomAccessIterator2 values_first);
 
 } // end namespace sequential
 } // end namespace detail
@@ -52,4 +52,3 @@ void stable_primitive_sort_by_key(sequential::execution_policy<DerivedPolicy> &e
 THRUST_NAMESPACE_END
 
 #include <thrust/system/detail/sequential/stable_primitive_sort.inl>
-

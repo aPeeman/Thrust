@@ -21,8 +21,16 @@
 #pragma once
 
 #include <thrust/detail/config.h>
-#include <thrust/detail/execution_policy.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/execute_with_allocator.h>
+#include <thrust/detail/execution_policy.h>
 #include <thrust/detail/seq.h>
 
 //! \cond
@@ -44,28 +52,21 @@ THRUST_NAMESPACE_BEGIN
 /*! \cond
  */
 
-
 namespace detail
 {
 
-
 typedef thrust::system::__THRUST_HOST_SYSTEM_NAMESPACE::detail::par_t host_t;
-
 
 typedef thrust::system::__THRUST_DEVICE_SYSTEM_NAMESPACE::detail::par_t device_t;
 
-
-} // end detail
-
+} // namespace detail
 
 /*! \endcond
  */
 
-
 /*! \addtogroup execution_policies Parallel Execution Policies
  *  \{
  */
-
 
 // define execution_policy for the purpose of Doxygenating it
 // it is actually defined elsewhere
@@ -128,7 +129,6 @@ struct execution_policy : thrust::detail::execution_policy_base<DerivedPolicy>
 {};
 #endif
 
-
 /*! \p host_execution_policy is the base class for all Thrust parallel execution policies
  *  which are derived from Thrust's default host backend system configured with the \p THRUST_HOST_SYSTEM
  *  macro.
@@ -184,11 +184,9 @@ struct execution_policy : thrust::detail::execution_policy_base<DerivedPolicy>
  *  \see execution_policy
  *  \see device_execution_policy
  */
-template<typename DerivedPolicy>
-  struct host_execution_policy
-    : thrust::system::__THRUST_HOST_SYSTEM_NAMESPACE::execution_policy<DerivedPolicy>
+template <typename DerivedPolicy>
+struct host_execution_policy : thrust::system::__THRUST_HOST_SYSTEM_NAMESPACE::execution_policy<DerivedPolicy>
 {};
-
 
 /*! \p device_execution_policy is the base class for all Thrust parallel execution policies
  *  which are derived from Thrust's default device backend system configured with the \p THRUST_DEVICE_SYSTEM
@@ -245,11 +243,9 @@ template<typename DerivedPolicy>
  *  \see execution_policy
  *  \see host_execution_policy
  */
-template<typename DerivedPolicy>
-  struct device_execution_policy
-    : thrust::system::__THRUST_DEVICE_SYSTEM_NAMESPACE::execution_policy<DerivedPolicy>
+template <typename DerivedPolicy>
+struct device_execution_policy : thrust::system::__THRUST_DEVICE_SYSTEM_NAMESPACE::execution_policy<DerivedPolicy>
 {};
-
 
 /*! \p thrust::host is the default parallel execution policy associated with Thrust's host backend system
  *  configured by the \p THRUST_HOST_SYSTEM macro.
@@ -282,10 +278,9 @@ template<typename DerivedPolicy>
  *    }
  *  };
  *  ...
- *  int vec(3);
- *  vec[0] = 0; vec[1] = 1; vec[2] = 2;
+ *  int vec[] = { 0, 1, 2 };
  *
- *  thrust::for_each(thrust::host, vec.begin(), vec.end(), printf_functor());
+ *  thrust::for_each(thrust::host, vec, vec + 3, printf_functor());
  *
  *  // 0 1 2 is printed to standard output in some unspecified order
  *  \endcode
@@ -294,7 +289,6 @@ template<typename DerivedPolicy>
  *  \see thrust::device
  */
 static const detail::host_t host;
-
 
 /*! \p thrust::device is the default parallel execution policy associated with Thrust's device backend system
  *  configured by the \p THRUST_DEVICE_SYSTEM macro.
@@ -344,7 +338,6 @@ static const detail::host_t host;
  */
 THRUST_INLINE_CONSTANT detail::device_t device;
 
-
 // define seq for the purpose of Doxygenating it
 // it is actually defined elsewhere
 #if 0
@@ -385,9 +378,7 @@ THRUST_INLINE_CONSTANT detail::device_t device;
 static const detail::seq_t seq;
 #endif
 
-
 /*! \}
  */
-
 
 THRUST_NAMESPACE_END

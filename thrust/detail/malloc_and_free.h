@@ -17,60 +17,69 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 #include <thrust/detail/execution_policy.h>
+#include <thrust/detail/malloc_and_free_fwd.h>
 #include <thrust/detail/pointer.h>
 #include <thrust/detail/raw_pointer_cast.h>
-#include <thrust/system/detail/generic/memory.h>
 #include <thrust/system/detail/adl/malloc_and_free.h>
+#include <thrust/system/detail/generic/memory.h>
 
 THRUST_NAMESPACE_BEGIN
 
-__thrust_exec_check_disable__
-template<typename DerivedPolicy>
-__host__ __device__
-pointer<void,DerivedPolicy> malloc(const thrust::detail::execution_policy_base<DerivedPolicy> &exec, std::size_t n)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy>
+_CCCL_HOST_DEVICE pointer<void, DerivedPolicy>
+malloc(const thrust::detail::execution_policy_base<DerivedPolicy>& exec, std::size_t n)
 {
   using thrust::system::detail::generic::malloc;
 
   // XXX should use a hypothetical thrust::static_pointer_cast here
-  void *raw_ptr = static_cast<void*>(thrust::raw_pointer_cast(malloc(thrust::detail::derived_cast(thrust::detail::strip_const(exec)), n)));
+  void* raw_ptr = static_cast<void*>(
+    thrust::raw_pointer_cast(malloc(thrust::detail::derived_cast(thrust::detail::strip_const(exec)), n)));
 
-  return pointer<void,DerivedPolicy>(raw_ptr);
+  return pointer<void, DerivedPolicy>(raw_ptr);
 }
 
-__thrust_exec_check_disable__
-template<typename T, typename DerivedPolicy>
-__host__ __device__
-pointer<T,DerivedPolicy> malloc(const thrust::detail::execution_policy_base<DerivedPolicy> &exec, std::size_t n)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename T, typename DerivedPolicy>
+_CCCL_HOST_DEVICE pointer<T, DerivedPolicy>
+malloc(const thrust::detail::execution_policy_base<DerivedPolicy>& exec, std::size_t n)
 {
   using thrust::system::detail::generic::malloc;
 
-  T *raw_ptr = static_cast<T*>(thrust::raw_pointer_cast(malloc<T>(thrust::detail::derived_cast(thrust::detail::strip_const(exec)), n)));
+  T* raw_ptr = static_cast<T*>(
+    thrust::raw_pointer_cast(malloc<T>(thrust::detail::derived_cast(thrust::detail::strip_const(exec)), n)));
 
-  return pointer<T,DerivedPolicy>(raw_ptr);
+  return pointer<T, DerivedPolicy>(raw_ptr);
 }
-
 
 // XXX WAR nvbug 992955
 #if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
-#if CUDART_VERSION < 5000
+#  if CUDART_VERSION < 5000
 
 // cudafe generates unqualified calls to free(int *volatile)
 // which get confused with thrust::free
 // spoof a thrust::free which simply maps to ::free
-inline __host__ __device__
-void free(int *volatile ptr)
+inline _CCCL_HOST_DEVICE void free(int* volatile ptr)
 {
   ::free(ptr);
 }
 
-#endif // CUDART_VERSION
+#  endif // CUDART_VERSION
 #endif // THRUST_DEVICE_COMPILER
 
-__thrust_exec_check_disable__
-template<typename DerivedPolicy, typename Pointer>
-__host__ __device__
-void free(const thrust::detail::execution_policy_base<DerivedPolicy> &exec, Pointer ptr)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy, typename Pointer>
+_CCCL_HOST_DEVICE void free(const thrust::detail::execution_policy_base<DerivedPolicy>& exec, Pointer ptr)
 {
   using thrust::system::detail::generic::free;
 

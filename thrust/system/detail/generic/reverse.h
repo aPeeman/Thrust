@@ -14,10 +14,17 @@
  *  limitations under the License.
  */
 
-
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/system/detail/generic/tag.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -28,23 +35,16 @@ namespace detail
 namespace generic
 {
 
+template <typename DerivedPolicy, typename BidirectionalIterator>
+_CCCL_HOST_DEVICE void
+reverse(thrust::execution_policy<DerivedPolicy>& exec, BidirectionalIterator first, BidirectionalIterator last);
 
-template<typename DerivedPolicy, typename BidirectionalIterator>
-__host__ __device__
-  void reverse(thrust::execution_policy<DerivedPolicy> &exec,
-               BidirectionalIterator first,
-               BidirectionalIterator last);
-
-
-template<typename DerivedPolicy,
-         typename BidirectionalIterator,
-         typename OutputIterator>
-__host__ __device__
-  OutputIterator reverse_copy(thrust::execution_policy<DerivedPolicy> &exec,
-                              BidirectionalIterator first,
-                              BidirectionalIterator last,
-                              OutputIterator result);
-
+template <typename DerivedPolicy, typename BidirectionalIterator, typename OutputIterator>
+_CCCL_HOST_DEVICE OutputIterator reverse_copy(
+  thrust::execution_policy<DerivedPolicy>& exec,
+  BidirectionalIterator first,
+  BidirectionalIterator last,
+  OutputIterator result);
 
 } // end namespace generic
 } // end namespace detail
@@ -52,4 +52,3 @@ __host__ __device__
 THRUST_NAMESPACE_END
 
 #include <thrust/system/detail/generic/reverse.inl>
-

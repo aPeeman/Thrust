@@ -1,6 +1,5 @@
-
 /*
- *  Copyright 2008-2018 NVIDIA Corporation
+ *  Copyright 2008-2021 NVIDIA Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,121 +14,180 @@
  *  limitations under the License.
  */
 
-/*! \file is_operator_less_or_greater_function_object.h
- *  \brief Type traits for determining if a \c BinaryFunction is equivalent to
-///        either \c operator< or \c operator>.
+/*! \file
+ *  \brief Type traits for determining if a
+ *  <a href="https://en.cppreference.com/w/cpp/named_req/BinaryPredicate">BinaryPredicate</a>
+ *  is equivalent to either \c operator< or \c operator>.
  */
 
 #pragma once
 
 #include <thrust/detail/config.h>
-#include <thrust/functional.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/type_traits.h>
 #include <thrust/detail/type_traits/pointer_traits.h>
+#include <thrust/functional.h>
 
 THRUST_NAMESPACE_BEGIN
+
+/*! \addtogroup utility
+ *  \{
+ */
+
+/*! \addtogroup type_traits Type Traits
+ *  \{
+ */
+
+/*! \cond
+ */
 
 namespace detail
 {
 
-template <typename FunctionObject>
+template <typename T>
 struct is_operator_less_function_object_impl;
 
-template <typename FunctionObject>
+template <typename T>
 struct is_operator_greater_function_object_impl;
 
 } // namespace detail
 
-/// Unary metafunction returns \c true_type if \c FunctionObject is equivalent
-/// to \c operator<, and \c false_type otherwise.
-template <typename FunctionObject>
-#if THRUST_CPP_DIALECT >= 2011
-using is_operator_less_function_object =
-#else
-struct is_operator_less_function_object :
+/*! \endcond
+ */
+
+/*! \brief <a href="https://en.cppreference.com/w/cpp/named_req/UnaryTypeTrait"><i>UnaryTypeTrait</i></a>
+ *  that returns \c true_type if \c T is a
+ *  <a href="https://en.cppreference.com/w/cpp/named_req/BinaryPredicate">BinaryPredicate</a>
+ *  equivalent to \c operator<, and \c false_type otherwise.
+ *
+ *  \see is_operator_less_function_object_v
+ *  \see is_operator_greater_function_object
+ *  \see is_operator_less_or_greater_function_object
+ *  \see is_operator_plus_function_object
+ */
+template <typename T>
+using is_operator_less_function_object = detail::is_operator_less_function_object_impl<T>;
+
+#if _CCCL_STD_VER >= 2014
+/*! \brief <tt>constexpr bool</tt> that is \c true if \c T is a
+ *  <a href="https://en.cppreference.com/w/cpp/named_req/BinaryPredicate">BinaryPredicate</a>
+ *  equivalent to \c operator<, and \c false otherwise.
+ *
+ *  \see is_operator_less_function_object
+ *  \see is_operator_greater_function_object
+ *  \see is_operator_less_or_greater_function_object
+ *  \see is_operator_plus_function_object
+ */
+template <typename T>
+constexpr bool is_operator_less_function_object_v = is_operator_less_function_object<T>::value;
 #endif
-  detail::is_operator_less_function_object_impl<FunctionObject>
-#if THRUST_CPP_DIALECT < 2011
-{}
+
+/*! \brief <a href="https://en.cppreference.com/w/cpp/named_req/UnaryTypeTrait"><i>UnaryTypeTrait</i></a>
+ *  that returns \c true_type if \c T is a
+ *  <a href="https://en.cppreference.com/w/cpp/named_req/BinaryPredicate">BinaryPredicate</a>
+ *  equivalent to \c operator>, and \c false_type otherwise.
+ *
+ *  \see is_operator_greater_function_object_v
+ *  \see is_operator_less_function_object
+ *  \see is_operator_less_or_greater_function_object
+ *  \see is_operator_plus_function_object
+ */
+template <typename T>
+using is_operator_greater_function_object = detail::is_operator_greater_function_object_impl<T>;
+
+#if _CCCL_STD_VER >= 2014
+/*! \brief <tt>constexpr bool</tt> that is \c true if \c T is a
+ *  <a href="https://en.cppreference.com/w/cpp/named_req/BinaryPredicate">BinaryPredicate</a>
+ *  equivalent to \c operator>, and \c false otherwise.
+ *
+ *  \see is_operator_greater_function_object
+ *  \see is_operator_less_function_object
+ *  \see is_operator_less_or_greater_function_object
+ *  \see is_operator_plus_function_object
+ */
+template <typename T>
+constexpr bool is_operator_greater_function_object_v = is_operator_greater_function_object<T>::value;
+#endif
+
+/*! \brief <a href="https://en.cppreference.com/w/cpp/named_req/UnaryTypeTrait"><i>UnaryTypeTrait</i></a>
+ *  that returns \c true_type if \c T is a
+ *  <a href="https://en.cppreference.com/w/cpp/named_req/BinaryPredicate">BinaryPredicate</a>
+ *  equivalent to \c operator< or \c operator>, and \c false_type otherwise.
+ *
+ *  \see is_operator_less_or_greater_function_object_v
+ *  \see is_operator_less_function_object
+ *  \see is_operator_greater_function_object
+ *  \see is_operator_plus_function_object
+ */
+template <typename T>
+using is_operator_less_or_greater_function_object = integral_constant<
+  bool,
+  detail::is_operator_less_function_object_impl<T>::value || detail::is_operator_greater_function_object_impl<T>::value>
+#if _CCCL_STD_VER < 2011
+  {}
 #endif
 ;
 
-#if THRUST_CPP_DIALECT >= 2014
-/// <code>constexpr bool</code> that is \c true if \c FunctionObject is
-/// equivalent to \c operator<, and \c false otherwise.
-template <typename FunctionObject>
-constexpr bool is_operator_less_function_object_v
-  = is_operator_less_function_object<FunctionObject>::value;
-#endif
-
-/// Unary metafunction returns \c true_type if \c FunctionObject is equivalent
-/// to \c operator>, and \c false_type otherwise.
-template <typename FunctionObject>
-#if THRUST_CPP_DIALECT >= 2011
-using is_operator_greater_function_object =
-#else
-struct is_operator_greater_function_object :
-#endif
-  detail::is_operator_greater_function_object_impl<FunctionObject>
-#if THRUST_CPP_DIALECT < 2011
-{}
-#endif
-;
-
-#if THRUST_CPP_DIALECT >= 2014
-/// <code>constexpr bool</code> that is \c true if \c FunctionObject is
-/// equivalent to \c operator>, and \c false otherwise.
-template <typename FunctionObject>
-constexpr bool is_operator_greater_function_object_v
-  = is_operator_greater_function_object<FunctionObject>::value;
-#endif
-
-/// Unary metafunction returns \c true_type if \c FunctionObject is equivalent
-/// to either \c operator<, and \c false_type otherwise.
-template <typename FunctionObject>
-#if THRUST_CPP_DIALECT >= 2011
-using is_operator_less_or_greater_function_object =
-#else
-struct is_operator_less_or_greater_function_object :
-#endif
-  integral_constant<
-    bool 
-  ,    detail::is_operator_less_function_object_impl<FunctionObject>::value
-    || detail::is_operator_greater_function_object_impl<FunctionObject>::value
-  >
-#if THRUST_CPP_DIALECT < 2011
-{}
-#endif
-;
-
-#if THRUST_CPP_DIALECT >= 2014
-/// <code>constexpr bool</code> that is \c true if \c FunctionObject is
-/// equivalent to either \c operator< or \c operator>, and \c false otherwise.
-template <typename FunctionObject>
-constexpr bool is_operator_less_or_greater_function_object_v
-  = is_operator_less_or_greater_function_object<FunctionObject>::value;
+#if _CCCL_STD_VER >= 2014
+/*! \brief <tt>constexpr bool</tt> that is \c true if \c T is a
+ *  <a href="https://en.cppreference.com/w/cpp/named_req/BinaryPredicate">BinaryPredicate</a>
+ *  equivalent to \c operator< or \c operator>, and \c false otherwise.
+ *
+ *  \see is_operator_less_or_greater_function_object
+ *  \see is_operator_less_function_object
+ *  \see is_operator_greater_function_object
+ *  \see is_operator_plus_function_object
+ */
+template <typename T>
+constexpr bool is_operator_less_or_greater_function_object_v = is_operator_less_or_greater_function_object<T>::value;
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 
+/*! \cond
+ */
+
 namespace detail
 {
 
-template <typename FunctionObject>
-struct is_operator_less_function_object_impl                   : false_type {};
 template <typename T>
-struct is_operator_less_function_object_impl<thrust::less<T> > : true_type {};
+struct is_operator_less_function_object_impl : false_type
+{};
 template <typename T>
-struct is_operator_less_function_object_impl<std::less<T>    > : true_type {};
+struct is_operator_less_function_object_impl<thrust::less<T>> : true_type
+{};
+template <typename T>
+struct is_operator_less_function_object_impl<std::less<T>> : true_type
+{};
 
-template <typename FunctionObject>
-struct is_operator_greater_function_object_impl                      : false_type {};
 template <typename T>
-struct is_operator_greater_function_object_impl<thrust::greater<T> > : true_type {};
+struct is_operator_greater_function_object_impl : false_type
+{};
 template <typename T>
-struct is_operator_greater_function_object_impl<std::greater<T>    > : true_type {};
+struct is_operator_greater_function_object_impl<thrust::greater<T>> : true_type
+{};
+template <typename T>
+struct is_operator_greater_function_object_impl<std::greater<T>> : true_type
+{};
 
 } // namespace detail
 
-THRUST_NAMESPACE_END
+/*! \endcond
+ */
 
+///////////////////////////////////////////////////////////////////////////////
+
+/*! \} // type traits
+ */
+
+/*! \} // utility
+ */
+
+THRUST_NAMESPACE_END

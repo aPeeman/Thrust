@@ -18,6 +18,14 @@
 
 #include <thrust/detail/config.h>
 
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 // the purpose of this header is to #include the per_device_resource.h header
 // of the sequential, host, and device systems. It should be #included in any
 // code which uses adl to dispatch per_device_resource
@@ -25,10 +33,10 @@
 #include <thrust/system/detail/sequential/per_device_resource.h>
 
 #if 0
-#include <thrust/system/cpp/detail/per_device_resource.h>
-#include <thrust/system/cuda/detail/per_device_resource.h>
-#include <thrust/system/omp/detail/per_device_resource.h>
-#include <thrust/system/tbb/detail/per_device_resource.h>
+#  include <thrust/system/cpp/detail/per_device_resource.h>
+#  include <thrust/system/cuda/detail/per_device_resource.h>
+#  include <thrust/system/omp/detail/per_device_resource.h>
+#  include <thrust/system/tbb/detail/per_device_resource.h>
 #endif
 
 #define __THRUST_HOST_SYSTEM_PER_DEVICE_RESOURCE_HEADER <__THRUST_HOST_SYSTEM_ROOT/detail/per_device_resource.h>
@@ -38,4 +46,3 @@
 #define __THRUST_DEVICE_SYSTEM_PER_DEVICE_RESOURCE_HEADER <__THRUST_DEVICE_SYSTEM_ROOT/detail/per_device_resource.h>
 #include __THRUST_DEVICE_SYSTEM_PER_DEVICE_RESOURCE_HEADER
 #undef __THRUST_DEVICE_SYSTEM_PER_DEVICE_RESOURCE_HEADER
-

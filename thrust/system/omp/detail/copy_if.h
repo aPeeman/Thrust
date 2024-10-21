@@ -17,6 +17,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/system/omp/detail/execution_policy.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -27,24 +35,22 @@ namespace omp
 namespace detail
 {
 
+template <typename DerivedPolicy,
+          typename InputIterator1,
+          typename InputIterator2,
+          typename OutputIterator,
+          typename Predicate>
+OutputIterator copy_if(
+  execution_policy<DerivedPolicy>& exec,
+  InputIterator1 first,
+  InputIterator1 last,
+  InputIterator2 stencil,
+  OutputIterator result,
+  Predicate pred);
 
-template<typename DerivedPolicy,
-         typename InputIterator1,
-         typename InputIterator2,
-         typename OutputIterator,
-         typename Predicate>
-  OutputIterator copy_if(execution_policy<DerivedPolicy> &exec,
-                         InputIterator1 first,
-                         InputIterator1 last,
-                         InputIterator2 stencil,
-                         OutputIterator result,
-                         Predicate pred);
-
-
-} // end detail
-} // end omp
-} // end system
+} // namespace detail
+} // namespace omp
+} // namespace system
 THRUST_NAMESPACE_END
 
 #include <thrust/system/omp/detail/copy_if.inl>
-

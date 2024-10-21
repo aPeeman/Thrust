@@ -16,6 +16,16 @@
 
 #pragma once
 
+#include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 // When a compiler uses Thrust as part of its implementation of Standard C++
 // algorithms, a cycle of included files may result when Thrust code tries to
 // use a standard algorithm.  Having a macro that is defined only when Thrust
@@ -27,4 +37,4 @@
 
 #define THRUST_INCLUDING_ALGORITHMS_HEADER
 #include <memory>
-#undef  THRUST_INCLUDING_ALGORITHMS_HEADER
+#undef THRUST_INCLUDING_ALGORITHMS_HEADER

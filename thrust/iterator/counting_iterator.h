@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file thrust/iterator/counting_iterator.h
  *  \brief An iterator which returns an increasing incrementable value
  *         when dereferenced
@@ -32,9 +31,17 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/iterator/iterator_adaptor.h>
-#include <thrust/iterator/iterator_facade.h>
 #include <thrust/iterator/iterator_categories.h>
+#include <thrust/iterator/iterator_facade.h>
 
 // #include the details first
 #include <thrust/iterator/detail/counting_iterator.inl>
@@ -124,104 +131,91 @@ THRUST_NAMESPACE_BEGIN
  *
  *  \see make_counting_iterator
  */
-template<typename Incrementable,
-         typename System = use_default,
-         typename Traversal = use_default,
-         typename Difference = use_default>
-  class counting_iterator
-    : public detail::counting_iterator_base<Incrementable, System, Traversal, Difference>::type
+template <typename Incrementable,
+          typename System     = use_default,
+          typename Traversal  = use_default,
+          typename Difference = use_default>
+class counting_iterator : public detail::counting_iterator_base<Incrementable, System, Traversal, Difference>::type
 {
-    /*! \cond
-     */
-    typedef typename detail::counting_iterator_base<Incrementable, System, Traversal, Difference>::type super_t;
+  /*! \cond
+   */
+  typedef typename detail::counting_iterator_base<Incrementable, System, Traversal, Difference>::type super_t;
 
-    friend class thrust::iterator_core_access;
+  friend class thrust::iterator_core_access;
 
-  public:
-    typedef typename super_t::reference       reference;
-    typedef typename super_t::difference_type difference_type;
+public:
+  typedef typename super_t::reference reference;
+  typedef typename super_t::difference_type difference_type;
 
-    /*! \endcond
-     */
+  /*! \endcond
+   */
 
-    /*! Null constructor initializes this \p counting_iterator's \c Incrementable
-     *  counter using its null constructor.
-     */
-    __host__ __device__
-    counting_iterator() {}
+  /*! Default constructor initializes this \p counting_iterator's counter to
+   * `Incrementable{}`.
+   */
+  _CCCL_HOST_DEVICE counting_iterator()
+      : super_t(Incrementable{})
+  {}
 
-    /*! Copy constructor copies the value of another \p counting_iterator into a
-     *  new \p counting_iterator.
-     *
-     *  \p rhs The \p counting_iterator to copy.
-     */
-    __host__ __device__
-    counting_iterator(counting_iterator const &rhs):super_t(rhs.base()){}
+  /*! Copy constructor copies the value of another counting_iterator
+   *  with related System type.
+   *
+   *  \param rhs The \p counting_iterator to copy.
+   */
+  template <
+    class OtherSystem,
+    detail::enable_if_convertible_t<
+      typename thrust::iterator_system<counting_iterator<Incrementable, OtherSystem, Traversal, Difference>>::type,
+      typename thrust::iterator_system<super_t>::type,
+      int> = 0>
+  _CCCL_HOST_DEVICE counting_iterator(counting_iterator<Incrementable, OtherSystem, Traversal, Difference> const& rhs)
+      : super_t(rhs.base())
+  {}
 
-    /*! Copy constructor copies the value of another counting_iterator
-     *  with related System type.
-     *
-     *  \param rhs The \p counting_iterator to copy.
-     */
-    template<typename OtherSystem>
-    __host__ __device__
-    counting_iterator(counting_iterator<Incrementable, OtherSystem, Traversal, Difference> const &rhs,
-                      typename thrust::detail::enable_if_convertible<
-                        typename thrust::iterator_system<counting_iterator<Incrementable,OtherSystem,Traversal,Difference> >::type,
-                        typename thrust::iterator_system<super_t>::type
-                      >::type * = 0)
-      : super_t(rhs.base()){}
+  /*! This \c explicit constructor copies the value of an \c Incrementable
+   *  into a new \p counting_iterator's \c Incrementable counter.
+   *
+   *  \param x The initial value of the new \p counting_iterator's \c Incrementable
+   *         counter.
+   */
+  _CCCL_HOST_DEVICE explicit counting_iterator(Incrementable x)
+      : super_t(x)
+  {}
 
-    /*! This \c explicit constructor copies the value of an \c Incrementable
-     *  into a new \p counting_iterator's \c Incrementable counter.
-     *
-     *  \param x The initial value of the new \p counting_iterator's \c Incrementable
-     *         counter.
-     */
-    __host__ __device__
-    explicit counting_iterator(Incrementable x):super_t(x){}
+  /*! \cond
+   */
 
-#if THRUST_CPP_DIALECT >= 2011
-    counting_iterator & operator=(const counting_iterator &) = default;
-#endif
+private:
+  _CCCL_HOST_DEVICE reference dereference() const
+  {
+    return this->base_reference();
+  }
 
-    /*! \cond
-     */
-  private:
-    __host__ __device__
-    reference dereference() const
-    {
-      return this->base_reference();
-    }
+  // note that we implement equal specially for floating point counting_iterator
+  template <typename OtherIncrementable, typename OtherSystem, typename OtherTraversal, typename OtherDifference>
+  _CCCL_HOST_DEVICE bool
+  equal(counting_iterator<OtherIncrementable, OtherSystem, OtherTraversal, OtherDifference> const& y) const
+  {
+    typedef thrust::detail::counting_iterator_equal<difference_type, Incrementable, OtherIncrementable> e;
+    return e::equal(this->base(), y.base());
+  }
 
-    // note that we implement equal specially for floating point counting_iterator
-    template <typename OtherIncrementable, typename OtherSystem, typename OtherTraversal, typename OtherDifference>
-    __host__ __device__
-    bool equal(counting_iterator<OtherIncrementable, OtherSystem, OtherTraversal, OtherDifference> const& y) const
-    {
-      typedef thrust::detail::counting_iterator_equal<difference_type,Incrementable,OtherIncrementable> e;
-      return e::equal(this->base(), y.base());
-    }
+  template <class OtherIncrementable>
+  _CCCL_HOST_DEVICE difference_type
+  distance_to(counting_iterator<OtherIncrementable, System, Traversal, Difference> const& y) const
+  {
+    typedef typename thrust::detail::eval_if<
+      thrust::detail::is_numeric<Incrementable>::value,
+      thrust::detail::identity_<thrust::detail::number_distance<difference_type, Incrementable, OtherIncrementable>>,
+      thrust::detail::identity_<
+        thrust::detail::iterator_distance<difference_type, Incrementable, OtherIncrementable>>>::type d;
 
-    template <class OtherIncrementable>
-    __host__ __device__
-    difference_type
-    distance_to(counting_iterator<OtherIncrementable, System, Traversal, Difference> const& y) const
-    {
-      typedef typename
-      thrust::detail::eval_if<
-        thrust::detail::is_numeric<Incrementable>::value,
-        thrust::detail::identity_<thrust::detail::number_distance<difference_type, Incrementable, OtherIncrementable> >,
-        thrust::detail::identity_<thrust::detail::iterator_distance<difference_type, Incrementable, OtherIncrementable> >
-      >::type d;
+    return d::distance(this->base(), y.base());
+  }
 
-      return d::distance(this->base(), y.base());
-    }
-
-    /*! \endcond
-     */
+  /*! \endcond
+   */
 }; // end counting_iterator
-
 
 /*! \p make_counting_iterator creates a \p counting_iterator
  *  using an initial value for its \c Incrementable counter.
@@ -230,8 +224,7 @@ template<typename Incrementable,
  *  \return A new \p counting_iterator whose counter has been initialized to \p x.
  */
 template <typename Incrementable>
-inline __host__ __device__
-counting_iterator<Incrementable> make_counting_iterator(Incrementable x)
+inline _CCCL_HOST_DEVICE counting_iterator<Incrementable> make_counting_iterator(Incrementable x)
 {
   return counting_iterator<Incrementable>(x);
 }
@@ -243,4 +236,3 @@ counting_iterator<Incrementable> make_counting_iterator(Incrementable x)
  */
 
 THRUST_NAMESPACE_END
-

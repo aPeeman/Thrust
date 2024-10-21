@@ -1,5 +1,5 @@
 /*
- *  Copyright 2020 NVIDIA Corporation
+ *  Copyright 2020-2021 NVIDIA Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,69 +14,72 @@
  *  limitations under the License.
  */
 
+#pragma once
+
 #include <thrust/detail/config.h>
 
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+#include <thrust/detail/type_traits.h>
 #include <thrust/iterator/iterator_adaptor.h>
 
 THRUST_NAMESPACE_BEGIN
 
 template <typename InputFunction, typename OutputFunction, typename Iterator>
-  class transform_input_output_iterator;
+class transform_input_output_iterator;
 
-namespace detail 
+namespace detail
 {
 
 // Proxy reference that invokes InputFunction when reading from and
 // OutputFunction when writing to the dereferenced iterator
 template <typename InputFunction, typename OutputFunction, typename Iterator>
-  class transform_input_output_iterator_proxy
+class transform_input_output_iterator_proxy
 {
   using iterator_value_type = typename thrust::iterator_value<Iterator>::type;
 
-  // std::result_of is deprecated in 2017, replace with std::invoke_result
-#if THRUST_CPP_DIALECT < 2017
-  using Value = typename std::result_of<InputFunction(iterator_value_type)>::type;
-#else
-  using Value = std::invoke_result_t<InputFunction, iterator_value_type>;
-#endif
+  using Value = invoke_result_t<InputFunction, iterator_value_type>;
 
-  public:
-    __host__ __device__
-    transform_input_output_iterator_proxy(const Iterator& io, InputFunction input_function, OutputFunction output_function)
-      : io(io), input_function(input_function), output_function(output_function)
-    {
-    }
+public:
+  _CCCL_HOST_DEVICE transform_input_output_iterator_proxy(
+    const Iterator& io, InputFunction input_function, OutputFunction output_function)
+      : io(io)
+      , input_function(input_function)
+      , output_function(output_function)
+  {}
 
-    transform_input_output_iterator_proxy(const transform_input_output_iterator_proxy&) = default;
+  transform_input_output_iterator_proxy(const transform_input_output_iterator_proxy&) = default;
 
-    __thrust_exec_check_disable__
-    __host__ __device__
-    operator Value const() const
-    {
-      return input_function(*io);
-    }
+  _CCCL_EXEC_CHECK_DISABLE
+  _CCCL_HOST_DEVICE operator Value const() const
+  {
+    return input_function(*io);
+  }
 
-    __thrust_exec_check_disable__
-    template <typename T>
-    __host__ __device__
-    transform_input_output_iterator_proxy operator=(const T& x)
-    {
-      *io = output_function(x);
-      return *this;
-    }
+  _CCCL_EXEC_CHECK_DISABLE
+  template <typename T>
+  _CCCL_HOST_DEVICE transform_input_output_iterator_proxy operator=(const T& x)
+  {
+    *io = output_function(x);
+    return *this;
+  }
 
-    __thrust_exec_check_disable__
-    __host__ __device__
-    transform_input_output_iterator_proxy operator=(const transform_input_output_iterator_proxy& x)
-    {
-      *io = output_function(x);
-      return *this;
-    }
+  _CCCL_EXEC_CHECK_DISABLE
+  _CCCL_HOST_DEVICE transform_input_output_iterator_proxy operator=(const transform_input_output_iterator_proxy& x)
+  {
+    *io = output_function(x);
+    return *this;
+  }
 
-  private:
-    Iterator io;
-    InputFunction input_function;
-    OutputFunction output_function;
+private:
+  Iterator io;
+  InputFunction input_function;
+  OutputFunction output_function;
 };
 
 // Compute the iterator_adaptor instantiation to be used for transform_input_output_iterator
@@ -87,29 +90,21 @@ private:
   using iterator_value_type = typename thrust::iterator_value<Iterator>::type;
 
 public:
-    typedef thrust::iterator_adaptor
-    <
-        transform_input_output_iterator<InputFunction, OutputFunction, Iterator>
-      , Iterator
-    // std::result_of is deprecated in 2017, replace with std::invoke_result
-#if THRUST_CPP_DIALECT < 2017
-      , typename std::result_of<InputFunction(iterator_value_type)>::type
-#else
-      , std::invoke_result_t<InputFunction, iterator_value_type>
-#endif
-      , thrust::use_default
-      , thrust::use_default
-      , transform_input_output_iterator_proxy<InputFunction, OutputFunction, Iterator>
-    > type;
+  typedef thrust::iterator_adaptor<transform_input_output_iterator<InputFunction, OutputFunction, Iterator>,
+                                   Iterator,
+                                   detail::invoke_result_t<InputFunction, iterator_value_type>,
+                                   thrust::use_default,
+                                   thrust::use_default,
+                                   transform_input_output_iterator_proxy<InputFunction, OutputFunction, Iterator>>
+    type;
 };
 
 // Register transform_input_output_iterator_proxy with 'is_proxy_reference' from
 // type_traits to enable its use with algorithms.
 template <typename InputFunction, typename OutputFunction, typename Iterator>
-struct is_proxy_reference<
-    transform_input_output_iterator_proxy<InputFunction, OutputFunction, Iterator> >
-    : public thrust::detail::true_type {};
+struct is_proxy_reference<transform_input_output_iterator_proxy<InputFunction, OutputFunction, Iterator>>
+    : public thrust::detail::true_type
+{};
 
-} // end detail
+} // namespace detail
 THRUST_NAMESPACE_END
-

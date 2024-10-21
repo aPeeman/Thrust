@@ -16,17 +16,28 @@
 
 #pragma once
 
+#include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 #include <thrust/detail/type_traits.h>
 
 #define __THRUST_DEFINE_HAS_NESTED_TYPE(trait_name, nested_type_name) \
-template<typename T> \
-  struct trait_name  \
-{                    \
-  typedef char yes_type; \
-  typedef int  no_type;  \
-  template<typename S> static yes_type test(typename S::nested_type_name *); \
-  template<typename S> static no_type  test(...); \
-  static bool const value = sizeof(test<T>(0)) == sizeof(yes_type);\
-  typedef thrust::detail::integral_constant<bool, value> type;\
-};
-
+  template <typename T>                                               \
+  struct trait_name                                                   \
+  {                                                                   \
+    typedef char yes_type;                                            \
+    typedef int no_type;                                              \
+    template <typename S>                                             \
+    static yes_type test(typename S::nested_type_name*);              \
+    template <typename S>                                             \
+    static no_type test(...);                                         \
+    static bool const value = sizeof(test<T>(0)) == sizeof(yes_type); \
+    typedef thrust::detail::integral_constant<bool, value> type;      \
+  };

@@ -14,8 +14,7 @@
  *  limitations under the License.
  */
 
-
-/*! \file universal_vector.h
+/*! \file
  *  \brief A dynamically-sizable array of elements which resides in memory
  *         accessible to both hosts and devices.
  */
@@ -23,6 +22,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/universal_allocator.h>
 
 // #include the device system's vector header
@@ -32,8 +39,7 @@
 
 THRUST_NAMESPACE_BEGIN
 
-/** \addtogroup memory_resources Memory Resources
- *  \ingroup memory_management_classes
+/*! \addtogroup containers Containers
  *  \{
  */
 
@@ -51,7 +57,7 @@ THRUST_NAMESPACE_BEGIN
  */
 using thrust::system::__THRUST_DEVICE_SYSTEM_NAMESPACE::universal_vector;
 
-/*! \}
+/*! \} // containers
  */
 
 THRUST_NAMESPACE_END

@@ -14,10 +14,17 @@
  *  limitations under the License.
  */
 
-
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/system/detail/generic/tag.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -28,24 +35,13 @@ namespace detail
 namespace generic
 {
 
-template<typename ExecutionPolicy,
-         typename InputIterator,
-         typename ForwardIterator>
-__host__ __device__
-  ForwardIterator uninitialized_copy(thrust::execution_policy<ExecutionPolicy> &exec,
-                                     InputIterator first,
-                                     InputIterator last,
-                                     ForwardIterator result);
+template <typename ExecutionPolicy, typename InputIterator, typename ForwardIterator>
+_CCCL_HOST_DEVICE ForwardIterator uninitialized_copy(
+  thrust::execution_policy<ExecutionPolicy>& exec, InputIterator first, InputIterator last, ForwardIterator result);
 
-template<typename ExecutionPolicy,
-         typename InputIterator,
-         typename Size,
-         typename ForwardIterator>
-__host__ __device__
-  ForwardIterator uninitialized_copy_n(thrust::execution_policy<ExecutionPolicy> &exec,
-                                       InputIterator first,
-                                       Size n,
-                                       ForwardIterator result);
+template <typename ExecutionPolicy, typename InputIterator, typename Size, typename ForwardIterator>
+_CCCL_HOST_DEVICE ForwardIterator uninitialized_copy_n(
+  thrust::execution_policy<ExecutionPolicy>& exec, InputIterator first, Size n, ForwardIterator result);
 
 } // end namespace generic
 } // end namespace detail
@@ -53,4 +49,3 @@ __host__ __device__
 THRUST_NAMESPACE_END
 
 #include <thrust/system/detail/generic/uninitialized_copy.inl>
-

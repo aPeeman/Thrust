@@ -18,54 +18,56 @@
 
 #include <thrust/detail/config.h>
 
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 #include <thrust/iterator/counting_iterator.h>
 #include <thrust/iterator/iterator_adaptor.h>
 
 THRUST_NAMESPACE_BEGIN
 
 // forward declaration of constant_iterator
-template<typename,typename,typename> class constant_iterator;
+template <typename, typename, typename>
+class constant_iterator;
 
 namespace detail
 {
 
-template<typename Value,
-         typename Incrementable,
-         typename System>
-  struct constant_iterator_base
+template <typename Value, typename Incrementable, typename System>
+struct constant_iterator_base
 {
-  typedef Value              value_type;
+  typedef Value value_type;
 
   // the reference type is the same as the value_type.
   // we wish to avoid returning a reference to the internal state
   // of the constant_iterator, which is prone to subtle bugs.
   // consider the temporary iterator created in the expression
   // *(iter + i)
-  typedef value_type         reference;
+  typedef value_type reference;
 
   // the incrementable type is int unless otherwise specified
-  typedef typename thrust::detail::ia_dflt_help<
-    Incrementable,
-    thrust::detail::identity_<thrust::detail::intmax_t>
-  >::type incrementable;
+  typedef
+    typename thrust::detail::ia_dflt_help<Incrementable, thrust::detail::identity_<thrust::detail::intmax_t>>::type
+      incrementable;
 
-  typedef typename thrust::counting_iterator<
-    incrementable,
-    System,
-    thrust::random_access_traversal_tag
-  > base_iterator;
+  typedef typename thrust::counting_iterator<incrementable, System, thrust::random_access_traversal_tag> base_iterator;
 
-  typedef typename thrust::iterator_adaptor<
-    constant_iterator<Value, Incrementable, System>,
-    base_iterator,
-    value_type, // XXX we may need to pass const value_type here as boost counting_iterator does
-    typename thrust::iterator_system<base_iterator>::type,
-    typename thrust::iterator_traversal<base_iterator>::type,
-    reference
-  > type;
+  typedef
+    typename thrust::iterator_adaptor<constant_iterator<Value, Incrementable, System>,
+                                      base_iterator,
+                                      value_type, // XXX we may need to pass const value_type here as boost
+                                                  // counting_iterator does
+                                      typename thrust::iterator_system<base_iterator>::type,
+                                      typename thrust::iterator_traversal<base_iterator>::type,
+                                      reference>
+      type;
 }; // end constant_iterator_base
 
-} // end detail
-  
-THRUST_NAMESPACE_END
+} // namespace detail
 
+THRUST_NAMESPACE_END

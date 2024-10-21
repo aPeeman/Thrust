@@ -22,12 +22,23 @@
 #pragma once
 
 #include <thrust/detail/config.h>
-#include <thrust/system/cpp/memory.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/vector_base.h>
+#include <thrust/system/cpp/memory.h>
+
 #include <vector>
 
 THRUST_NAMESPACE_BEGIN
-namespace system { namespace cpp
+namespace system
+{
+namespace cpp
 {
 
 /*! \p cpp::vector is a container that supports random access to elements,
@@ -71,12 +82,13 @@ using vector = thrust::detail::vector_base<T, Allocator>;
 template <typename T, typename Allocator = thrust::system::cpp::universal_allocator<T>>
 using universal_vector = thrust::detail::vector_base<T, Allocator>;
 
-}} // namespace system::cpp
+} // namespace cpp
+} // namespace system
 
 namespace cpp
 {
-using thrust::system::cpp::vector;
 using thrust::system::cpp::universal_vector;
-}
+using thrust::system::cpp::vector;
+} // namespace cpp
 
 THRUST_NAMESPACE_END

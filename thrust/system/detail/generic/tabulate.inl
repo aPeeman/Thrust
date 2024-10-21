@@ -14,12 +14,22 @@
  *  limitations under the License.
  */
 
+#pragma once
+
 #include <thrust/detail/config.h>
-#include <thrust/system/detail/generic/tabulate.h>
-#include <thrust/iterator/iterator_traits.h>
-#include <thrust/transform.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/distance.h>
 #include <thrust/iterator/counting_iterator.h>
+#include <thrust/iterator/iterator_traits.h>
+#include <thrust/system/detail/generic/tabulate.h>
+#include <thrust/transform.h>
 
 THRUST_NAMESPACE_BEGIN
 namespace system
@@ -29,15 +39,9 @@ namespace detail
 namespace generic
 {
 
-
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename UnaryOperation>
-__host__ __device__
-  void tabulate(thrust::execution_policy<DerivedPolicy> &exec,
-                ForwardIterator first,
-                ForwardIterator last,
-                UnaryOperation unary_op)
+template <typename DerivedPolicy, typename ForwardIterator, typename UnaryOperation>
+_CCCL_HOST_DEVICE void tabulate(
+  thrust::execution_policy<DerivedPolicy>& exec, ForwardIterator first, ForwardIterator last, UnaryOperation unary_op)
 {
   typedef typename iterator_difference<ForwardIterator>::type difference_type;
 
@@ -50,10 +54,7 @@ __host__ __device__
   thrust::transform(exec, iter, iter + thrust::distance(first, last), first, unary_op);
 } // end tabulate()
 
-
 } // end namespace generic
 } // end namespace detail
 } // end namespace system
 THRUST_NAMESPACE_END
-
-

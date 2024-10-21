@@ -18,53 +18,59 @@
 
 #include <thrust/detail/config.h>
 
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
+#include <nv/target>
+
 THRUST_NAMESPACE_BEGIN
 namespace detail
 {
 
-template<typename BaseAllocator>
-  struct no_throw_allocator : BaseAllocator
+template <typename BaseAllocator>
+struct no_throw_allocator : BaseAllocator
 {
-  private:
-    typedef BaseAllocator super_t;
-  
-  public:
-    inline __host__ __device__
-    no_throw_allocator(const BaseAllocator &other = BaseAllocator())
+private:
+  typedef BaseAllocator super_t;
+
+public:
+  inline _CCCL_HOST_DEVICE no_throw_allocator(const BaseAllocator& other = BaseAllocator())
       : super_t(other)
-    {}
+  {}
 
-    template<typename U>
-      struct rebind
-    {
-      typedef no_throw_allocator<typename super_t::template rebind<U>::other> other;
-    }; // end rebind
+  template <typename U>
+  struct rebind
+  {
+    typedef no_throw_allocator<typename super_t::template rebind<U>::other> other;
+  }; // end rebind
 
-    __host__ __device__
-    void deallocate(typename super_t::pointer p, typename super_t::size_type n)
-    {
-#ifndef __CUDA_ARCH__
-      try
-      {
-        super_t::deallocate(p, n);
-      } // end try
-      catch(...)
-      {
-        // catch anything
-      } // end catch
-#else
-      super_t::deallocate(p, n);
-#endif
-    } // end deallocate()
+  _CCCL_HOST_DEVICE void deallocate(typename super_t::pointer p, typename super_t::size_type n)
+  {
+    NV_IF_TARGET(
+      NV_IS_HOST,
+      (try { super_t::deallocate(p, n); } // end try
+       catch (...){
+         // catch anything
+       } // end catch
+       ),
+      (super_t::deallocate(p, n);));
+  } // end deallocate()
 
-    inline __host__ __device__
-    bool operator==(no_throw_allocator const &other) { return super_t::operator==(other); }
+  inline _CCCL_HOST_DEVICE bool operator==(no_throw_allocator const& other)
+  {
+    return super_t::operator==(other);
+  }
 
-    inline __host__ __device__
-    bool operator!=(no_throw_allocator const &other) { return super_t::operator!=(other); }
+  inline _CCCL_HOST_DEVICE bool operator!=(no_throw_allocator const& other)
+  {
+    return super_t::operator!=(other);
+  }
 }; // end no_throw_allocator
 
-} // end detail
+} // namespace detail
 THRUST_NAMESPACE_END
-
-

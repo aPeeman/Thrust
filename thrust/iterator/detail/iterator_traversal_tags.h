@@ -18,25 +18,33 @@
 
 #include <thrust/detail/config.h>
 
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 THRUST_NAMESPACE_BEGIN
 
 // define Boost's traversal tags
-struct no_traversal_tag {};
+struct no_traversal_tag
+{};
 
-struct incrementable_traversal_tag
-  : no_traversal_tag {};
+struct incrementable_traversal_tag : no_traversal_tag
+{};
 
-struct single_pass_traversal_tag
-  : incrementable_traversal_tag {};
+struct single_pass_traversal_tag : incrementable_traversal_tag
+{};
 
-struct forward_traversal_tag
-  : single_pass_traversal_tag {};
+struct forward_traversal_tag : single_pass_traversal_tag
+{};
 
-struct bidirectional_traversal_tag
-  : forward_traversal_tag {};
+struct bidirectional_traversal_tag : forward_traversal_tag
+{};
 
-struct random_access_traversal_tag
-  : bidirectional_traversal_tag {};
+struct random_access_traversal_tag : bidirectional_traversal_tag
+{};
 
 THRUST_NAMESPACE_END
-

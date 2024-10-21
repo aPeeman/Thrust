@@ -23,7 +23,17 @@
 // Based on Boost.Phoenix v1.2
 // Copyright (c) 2001-2002 Joel de Guzman
 
+#pragma once
+
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/functional/composite.h>
 #include <thrust/detail/functional/operators/assignment_operator.h>
 #include <thrust/functional.h>
@@ -38,31 +48,10 @@ namespace detail
 namespace functional
 {
 
-template<typename Eval>
-  __host__ __device__
-  constexpr actor<Eval>
-    ::actor()
-      : eval_type()
+template <typename Eval>
+_CCCL_HOST_DEVICE actor<Eval>::actor(const Eval& base)
+    : eval_type(base)
 {}
-
-template<typename Eval>
-  __host__ __device__
-  actor<Eval>
-    ::actor(const Eval &base)
-      : eval_type(base)
-{}
-
-template<typename Eval>
-  __host__ __device__
-  typename apply_actor<
-    typename actor<Eval>::eval_type,
-    typename thrust::null_type
-  >::type
-    actor<Eval>
-      ::operator()(void) const
-{
-  return eval_type::eval(thrust::null_type());
-} // end basic_environment::operator()
 
 // actor::operator() needs to construct a tuple of references to its
 // arguments. To make this work with thrust::reference<T>, we need to
@@ -75,19 +64,15 @@ template<typename Eval>
 // met.
 template <typename T>
 using actor_check_ref_type =
-  thrust::detail::integral_constant<bool,
-    ( std::is_lvalue_reference<T>::value ||
-      thrust::detail::is_wrapped_reference<T>::value )>;
+  ::cuda::std::integral_constant<bool,
+                                 (std::is_lvalue_reference<T>::value || thrust::detail::is_wrapped_reference<T>::value)>;
 
 template <typename... Ts>
-using actor_check_ref_types =
-  thrust::conjunction<actor_check_ref_type<Ts>...>;
+using actor_check_ref_types = thrust::conjunction<actor_check_ref_type<Ts>...>;
 
-template<typename Eval>
-template<typename... Ts>
-__host__ __device__
-typename apply_actor<typename actor<Eval>::eval_type,
-                     thrust::tuple<eval_ref<Ts>...>>::type
+template <typename Eval>
+template <typename... Ts>
+_CCCL_HOST_DEVICE typename apply_actor<typename actor<Eval>::eval_type, thrust::tuple<eval_ref<Ts>...>>::type
 actor<Eval>::operator()(Ts&&... ts) const
 {
   static_assert(actor_check_ref_types<Ts...>::value,
@@ -97,16 +82,13 @@ actor<Eval>::operator()(Ts&&... ts) const
   return eval_type::eval(tuple_type(THRUST_FWD(ts)...));
 } // end actor<Eval>::operator()
 
-template<typename Eval>
-  template<typename T>
-    __host__ __device__
-    typename assign_result<Eval,T>::type
-      actor<Eval>
-        ::operator=(const T& _1) const
+template <typename Eval>
+template <typename T>
+_CCCL_HOST_DEVICE typename assign_result<Eval, T>::type actor<Eval>::operator=(const T& _1) const
 {
-  return do_assign(*this,_1);
+  return do_assign(*this, _1);
 } // end actor::operator=()
 
-} // end functional
-} // end detail
+} // namespace functional
+} // namespace detail
 THRUST_NAMESPACE_END

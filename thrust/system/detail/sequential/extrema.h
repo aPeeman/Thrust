@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file extrema.h
  *  \brief Sequential implementations of extrema functions.
  */
@@ -22,8 +21,16 @@
 #pragma once
 
 #include <thrust/detail/config.h>
-#include <thrust/pair.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/function.h>
+#include <thrust/pair.h>
 #include <thrust/system/detail/sequential/execution_policy.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -34,28 +41,19 @@ namespace detail
 namespace sequential
 {
 
-
-__thrust_exec_check_disable__
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename BinaryPredicate>
-__host__ __device__
-ForwardIterator min_element(sequential::execution_policy<DerivedPolicy> &,
-                            ForwardIterator first, 
-                            ForwardIterator last,
-                            BinaryPredicate comp)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy, typename ForwardIterator, typename BinaryPredicate>
+_CCCL_HOST_DEVICE ForwardIterator min_element(
+  sequential::execution_policy<DerivedPolicy>&, ForwardIterator first, ForwardIterator last, BinaryPredicate comp)
 {
   // wrap comp
-  thrust::detail::wrapped_function<
-    BinaryPredicate,
-    bool
-  > wrapped_comp(comp);
+  thrust::detail::wrapped_function<BinaryPredicate, bool> wrapped_comp(comp);
 
   ForwardIterator imin = first;
 
-  for(; first != last; ++first)
+  for (; first != last; ++first)
   {
-    if(wrapped_comp(*first, *imin))
+    if (wrapped_comp(*first, *imin))
     {
       imin = first;
     }
@@ -64,28 +62,19 @@ ForwardIterator min_element(sequential::execution_policy<DerivedPolicy> &,
   return imin;
 }
 
-
-__thrust_exec_check_disable__
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename BinaryPredicate>
-__host__ __device__
-ForwardIterator max_element(sequential::execution_policy<DerivedPolicy> &,
-                            ForwardIterator first, 
-                            ForwardIterator last,
-                            BinaryPredicate comp)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy, typename ForwardIterator, typename BinaryPredicate>
+_CCCL_HOST_DEVICE ForwardIterator max_element(
+  sequential::execution_policy<DerivedPolicy>&, ForwardIterator first, ForwardIterator last, BinaryPredicate comp)
 {
   // wrap comp
-  thrust::detail::wrapped_function<
-    BinaryPredicate,
-    bool
-  > wrapped_comp(comp);
+  thrust::detail::wrapped_function<BinaryPredicate, bool> wrapped_comp(comp);
 
   ForwardIterator imax = first;
 
-  for(; first != last; ++first)
+  for (; first != last; ++first)
   {
-    if(wrapped_comp(*imax, *first))
+    if (wrapped_comp(*imax, *first))
     {
       imax = first;
     }
@@ -94,34 +83,25 @@ ForwardIterator max_element(sequential::execution_policy<DerivedPolicy> &,
   return imax;
 }
 
-
-__thrust_exec_check_disable__
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename BinaryPredicate>
-__host__ __device__
-thrust::pair<ForwardIterator,ForwardIterator> minmax_element(sequential::execution_policy<DerivedPolicy> &,
-                                                             ForwardIterator first, 
-                                                             ForwardIterator last,
-                                                             BinaryPredicate comp)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy, typename ForwardIterator, typename BinaryPredicate>
+_CCCL_HOST_DEVICE thrust::pair<ForwardIterator, ForwardIterator> minmax_element(
+  sequential::execution_policy<DerivedPolicy>&, ForwardIterator first, ForwardIterator last, BinaryPredicate comp)
 {
   // wrap comp
-  thrust::detail::wrapped_function<
-    BinaryPredicate,
-    bool
-  > wrapped_comp(comp);
-  
+  thrust::detail::wrapped_function<BinaryPredicate, bool> wrapped_comp(comp);
+
   ForwardIterator imin = first;
   ForwardIterator imax = first;
 
-  for(; first != last; ++first)
+  for (; first != last; ++first)
   {
-    if(wrapped_comp(*first, *imin))
+    if (wrapped_comp(*first, *imin))
     {
       imin = first;
     }
 
-    if(wrapped_comp(*imax, *first))
+    if (wrapped_comp(*imax, *first))
     {
       imax = first;
     }
@@ -130,9 +110,7 @@ thrust::pair<ForwardIterator,ForwardIterator> minmax_element(sequential::executi
   return thrust::make_pair(imin, imax);
 }
 
-
 } // end namespace sequential
 } // end namespace detail
 } // end namespace system
 THRUST_NAMESPACE_END
-

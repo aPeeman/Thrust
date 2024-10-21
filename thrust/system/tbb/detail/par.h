@@ -17,6 +17,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/allocator_aware_execution_policy.h>
 #include <thrust/system/tbb/detail/execution_policy.h>
 
@@ -28,34 +36,27 @@ namespace tbb
 namespace detail
 {
 
-
-struct par_t : thrust::system::tbb::detail::execution_policy<par_t>,
-  thrust::detail::allocator_aware_execution_policy<
-    thrust::system::tbb::detail::execution_policy>
+struct par_t
+    : thrust::system::tbb::detail::execution_policy<par_t>
+    , thrust::detail::allocator_aware_execution_policy<thrust::system::tbb::detail::execution_policy>
 {
-  __host__ __device__
-  constexpr par_t() : thrust::system::tbb::detail::execution_policy<par_t>() {}
+  _CCCL_HOST_DEVICE constexpr par_t()
+      : thrust::system::tbb::detail::execution_policy<par_t>()
+  {}
 };
 
-
-} // end detail
-
+} // namespace detail
 
 static const detail::par_t par;
 
-
-} // end tbb
-} // end system
-
+} // namespace tbb
+} // namespace system
 
 // alias par here
 namespace tbb
 {
 
-
 using thrust::system::tbb::par;
 
-
-} // end tbb
+} // namespace tbb
 THRUST_NAMESPACE_END
-

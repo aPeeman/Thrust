@@ -14,23 +14,28 @@
  *  limitations under the License.
  */
 
+#pragma once
 
-/*! \file distance.inl
- *  \brief Inline file for distance.h
- */
+#include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 
 #include <thrust/advance.h>
-#include <thrust/detail/config.h>
-#include <thrust/system/detail/generic/distance.h>
 #include <thrust/iterator/iterator_traits.h>
+#include <thrust/system/detail/generic/distance.h>
 
 THRUST_NAMESPACE_BEGIN
 
-__thrust_exec_check_disable__
-template<typename InputIterator>
-inline __host__ __device__
-  typename thrust::iterator_traits<InputIterator>::difference_type
-    distance(InputIterator first, InputIterator last)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename InputIterator>
+inline _CCCL_HOST_DEVICE typename thrust::iterator_traits<InputIterator>::difference_type
+distance(InputIterator first, InputIterator last)
 {
   return thrust::system::detail::generic::distance(first, last);
 } // end distance()

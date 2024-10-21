@@ -1,9 +1,9 @@
 /*
- *  Copyright 2008-2018 NVIDIA Corporation
+ *  Copyright 2008-2021 NVIDIA Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
- *  You may obtain a transform of the License at
+ *  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -14,48 +14,48 @@
  *  limitations under the License.
  */
 
-/*! \file async/transform.h
- *  \brief Functions for asynchronously transforming a range.
+/*! \file
+ *  \brief Algorithms for asynchronously transforming a range.
  */
 
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/cpp14_required.h>
 
-#if THRUST_CPP_DIALECT >= 2014
+#if _CCCL_STD_VER >= 2014
 
-#include <thrust/detail/static_assert.h>
-#include <thrust/detail/select_system.h>
-#include <thrust/type_traits/remove_cvref.h>
-#include <thrust/system/detail/adl/async/transform.h>
-
-#include <thrust/event.h>
+#  include <thrust/detail/select_system.h>
+#  include <thrust/detail/static_assert.h>
+#  include <thrust/event.h>
+#  include <thrust/system/detail/adl/async/transform.h>
+#  include <thrust/type_traits/remove_cvref.h>
 
 THRUST_NAMESPACE_BEGIN
 
 namespace async
 {
 
+/*! \cond
+ */
+
 namespace unimplemented
 {
 
-template <
-  typename DerivedPolicy
-, typename ForwardIt, typename Sentinel, typename OutputIt
-, typename UnaryOperation
->
-__host__
-event<DerivedPolicy>
-async_transform(
-  thrust::execution_policy<DerivedPolicy>& exec
-, ForwardIt first, Sentinel last, OutputIt output, UnaryOperation op
-)
+template <typename DerivedPolicy, typename ForwardIt, typename Sentinel, typename OutputIt, typename UnaryOperation>
+_CCCL_HOST event<DerivedPolicy> async_transform(
+  thrust::execution_policy<DerivedPolicy>& exec, ForwardIt first, Sentinel last, OutputIt output, UnaryOperation op)
 {
-  THRUST_STATIC_ASSERT_MSG(
-    (thrust::detail::depend_on_instantiation<ForwardIt, false>::value)
-  , "this algorithm is not implemented for the specified system"
-  );
+  THRUST_STATIC_ASSERT_MSG((thrust::detail::depend_on_instantiation<ForwardIt, false>::value),
+                           "this algorithm is not implemented for the specified system");
   return {};
 }
 
@@ -66,6 +66,7 @@ namespace transform_detail
 
 using thrust::async::unimplemented::async_transform;
 
+// clang-format off
 struct transform_fn final
 {
   template <
@@ -73,7 +74,7 @@ struct transform_fn final
   , typename ForwardIt, typename Sentinel, typename OutputIt
   , typename UnaryOperation
   >
-  __host__
+  _CCCL_HOST
   static auto
   call(
     thrust::detail::execution_policy_base<DerivedPolicy> const& exec
@@ -95,7 +96,7 @@ struct transform_fn final
     typename ForwardIt, typename Sentinel, typename OutputIt
   , typename UnaryOperation
   >
-  __host__
+  _CCCL_HOST
   static auto call(
     ForwardIt&& first, Sentinel&& last
   , OutputIt&& output
@@ -114,16 +115,20 @@ struct transform_fn final
   )
 
   template <typename... Args>
-  THRUST_NODISCARD __host__
+  _CCCL_NODISCARD _CCCL_HOST
   auto operator()(Args&&... args) const
   THRUST_RETURNS(
     call(THRUST_FWD(args)...)
   )
 };
+// clang-format on
 
-} // namespace tranform_detail
+} // namespace transform_detail
 
 THRUST_INLINE_CONSTANT transform_detail::transform_fn transform{};
+
+/*! \endcond
+ */
 
 } // namespace async
 

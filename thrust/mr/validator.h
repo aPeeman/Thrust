@@ -18,6 +18,14 @@
 
 #include <thrust/detail/config.h>
 
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 #include <thrust/detail/config/memory_resource.h>
 #include <thrust/mr/memory_resource.h>
 
@@ -25,27 +33,22 @@ THRUST_NAMESPACE_BEGIN
 namespace mr
 {
 
-template<typename MR>
+template <typename MR>
 struct validator
 {
-#if THRUST_CPP_DIALECT >= 2011
-  static_assert(
-    std::is_base_of<memory_resource<typename MR::pointer>, MR>::value,
-    "a type used as a memory resource must derive from memory_resource"
-  );
-#endif
+  static_assert(std::is_base_of<memory_resource<typename MR::pointer>, MR>::value,
+                "a type used as a memory resource must derive from memory_resource");
 };
 
-template<typename T, typename U>
-struct validator2 : private validator<T>, private validator<U>
-{
-};
+template <typename T, typename U>
+struct validator2
+    : private validator<T>
+    , private validator<U>
+{};
 
-template<typename T>
+template <typename T>
 struct validator2<T, T> : private validator<T>
-{
-};
+{};
 
-} // end mr
+} // namespace mr
 THRUST_NAMESPACE_END
-

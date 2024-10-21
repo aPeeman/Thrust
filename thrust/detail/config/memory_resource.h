@@ -16,20 +16,29 @@
 
 #pragma once
 
-#include <cstddef>
+#include <thrust/detail/config/config.h>
 
-#include <thrust/detail/config.h>
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 #include <thrust/detail/alignment.h>
 #include <thrust/detail/config/cpp_compatibility.h>
 
-#define THRUST_MR_DEFAULT_ALIGNMENT THRUST_ALIGNOF(THRUST_NS_QUALIFIER::detail::max_align_t)
+#include <cstddef>
 
-#if THRUST_CPP_DIALECT >= 2017
+#define THRUST_MR_DEFAULT_ALIGNMENT alignof(THRUST_NS_QUALIFIER::detail::max_align_t)
+
+#if _CCCL_STD_VER >= 2017
 #  if __has_include(<memory_resource>)
 #    define THRUST_MR_STD_MR_HEADER <memory_resource>
-#    define THRUST_MR_STD_MR_NS std::pmr
+#    define THRUST_MR_STD_MR_NS     std::pmr
 #  elif __has_include(<experimental/memory_resource>)
 #    define THRUST_MR_STD_MR_HEADER <experimental/memory_resource>
-#    define THRUST_MR_STD_MR_NS std::experimental::pmr
+#    define THRUST_MR_STD_MR_NS     std::experimental::pmr
 #  endif
 #endif

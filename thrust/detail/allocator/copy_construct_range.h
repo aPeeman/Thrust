@@ -17,30 +17,29 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/execution_policy.h>
 
 THRUST_NAMESPACE_BEGIN
 namespace detail
 {
 
-template<typename System, typename Allocator, typename InputIterator, typename Pointer>
-__host__ __device__
-  Pointer copy_construct_range(thrust::execution_policy<System> &from_system,
-                               Allocator &a,
-                               InputIterator first,
-                               InputIterator last,
-                               Pointer result);
+template <typename System, typename Allocator, typename InputIterator, typename Pointer>
+_CCCL_HOST_DEVICE Pointer copy_construct_range(
+  thrust::execution_policy<System>& from_system, Allocator& a, InputIterator first, InputIterator last, Pointer result);
 
-template<typename System, typename Allocator, typename InputIterator, typename Size, typename Pointer>
-__host__ __device__
-  Pointer copy_construct_range_n(thrust::execution_policy<System> &from_system,
-                                 Allocator &a,
-                                 InputIterator first,
-                                 Size n,
-                                 Pointer result);
+template <typename System, typename Allocator, typename InputIterator, typename Size, typename Pointer>
+_CCCL_HOST_DEVICE Pointer copy_construct_range_n(
+  thrust::execution_policy<System>& from_system, Allocator& a, InputIterator first, Size n, Pointer result);
 
-} // end detail
+} // namespace detail
 THRUST_NAMESPACE_END
 
 #include <thrust/detail/allocator/copy_construct_range.inl>
-

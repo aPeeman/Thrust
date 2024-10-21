@@ -16,11 +16,19 @@
 
 #pragma once
 
+#include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 /*! \file thrust/system/omp/execution_policy.h
  *  \brief Execution policies for Thrust's OpenMP system.
  */
-
-#include <thrust/detail/config.h>
 
 // get the execution policies definitions first
 #include <thrust/system/omp/detail/execution_policy.h>
@@ -71,7 +79,6 @@
 #include <thrust/system/omp/detail/uninitialized_fill.h>
 #include <thrust/system/omp/detail/unique.h>
 #include <thrust/system/omp/detail/unique_by_key.h>
-
 
 // define these entities here for the purpose of Doxygenating them
 // they are actually defined elsewhere
@@ -151,5 +158,3 @@ static const unspecified par;
 } // end system
 THRUST_NAMESPACE_END
 #endif
-
-

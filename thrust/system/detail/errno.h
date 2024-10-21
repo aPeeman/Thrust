@@ -14,10 +14,17 @@
  *  limitations under the License.
  */
 
-
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 
 // The rationale for the existence of these apparently redundant definitions is
 // to provide them portably and to avoid bringing in system headers which might
@@ -111,9 +118,8 @@ static const int enfile          = 9977;
 static const int emfile          = 9978;
 static const int emlink          = 9979;
 
-} // end detail
+} // namespace detail
 
-} // end system
+} // namespace system
 
 THRUST_NAMESPACE_END
-

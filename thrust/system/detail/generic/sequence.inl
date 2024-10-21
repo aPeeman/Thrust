@@ -14,9 +14,19 @@
  *  limitations under the License.
  */
 
+#pragma once
+
 #include <thrust/detail/config.h>
-#include <thrust/system/detail/generic/sequence.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/iterator/iterator_traits.h>
+#include <thrust/system/detail/generic/sequence.h>
 #include <thrust/tabulate.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -27,65 +37,58 @@ namespace detail
 namespace generic
 {
 
-
-template<typename DerivedPolicy, typename ForwardIterator>
-__host__ __device__
-  void sequence(thrust::execution_policy<DerivedPolicy> &exec,
-                ForwardIterator first,
-                ForwardIterator last)
+template <typename DerivedPolicy, typename ForwardIterator>
+_CCCL_HOST_DEVICE void
+sequence(thrust::execution_policy<DerivedPolicy>& exec, ForwardIterator first, ForwardIterator last)
 {
   typedef typename thrust::iterator_traits<ForwardIterator>::value_type T;
 
   thrust::sequence(exec, first, last, T(0));
 } // end sequence()
 
-
-template<typename DerivedPolicy, typename ForwardIterator, typename T>
-__host__ __device__
-  void sequence(thrust::execution_policy<DerivedPolicy> &exec,
-                ForwardIterator first,
-                ForwardIterator last,
-                T init)
+template <typename DerivedPolicy, typename ForwardIterator, typename T>
+_CCCL_HOST_DEVICE void
+sequence(thrust::execution_policy<DerivedPolicy>& exec, ForwardIterator first, ForwardIterator last, T init)
 {
   thrust::sequence(exec, first, last, init, T(1));
 } // end sequence()
 
 namespace detail
 {
-template <typename T>
+template <typename T, typename = void>
 struct compute_sequence_value
 {
   T init;
   T step;
 
-  __thrust_exec_check_disable__
-  __host__ __device__
-  T operator()(std::size_t i) const
+  _CCCL_EXEC_CHECK_DISABLE
+  _CCCL_HOST_DEVICE T operator()(std::size_t i) const
+  {
+    return init + step * i;
+  }
+};
+template <typename T>
+struct compute_sequence_value<T, typename std::enable_if<std::is_arithmetic<T>::value>::type>
+{
+  T init;
+  T step;
+
+  _CCCL_EXEC_CHECK_DISABLE
+  _CCCL_HOST_DEVICE T operator()(std::size_t i) const
   {
     return init + step * static_cast<T>(i);
   }
 };
-}
+} // namespace detail
 
-template<typename DerivedPolicy, typename ForwardIterator, typename T>
-__host__ __device__
-  void sequence(thrust::execution_policy<DerivedPolicy> &exec,
-                ForwardIterator first,
-                ForwardIterator last,
-                T init,
-                T step)
+template <typename DerivedPolicy, typename ForwardIterator, typename T>
+_CCCL_HOST_DEVICE void
+sequence(thrust::execution_policy<DerivedPolicy>& exec, ForwardIterator first, ForwardIterator last, T init, T step)
 {
-
-  thrust::tabulate(exec,
-                   first,
-                   last,
-                   detail::compute_sequence_value<T>{std::move(init),
-                                                     std::move(step)});
+  thrust::tabulate(exec, first, last, detail::compute_sequence_value<T>{std::move(init), std::move(step)});
 } // end sequence()
-
 
 } // end namespace generic
 } // end namespace detail
 } // end namespace system
 THRUST_NAMESPACE_END
-

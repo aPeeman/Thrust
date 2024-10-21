@@ -26,6 +26,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/functional/actor.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -34,46 +42,39 @@ namespace detail
 namespace functional
 {
 
+template <typename Eval>
+struct actor;
 
-template<typename Eval> struct actor;
-
-
-template<typename T>
-  class value
+template <typename T>
+class value
 {
-  public:
+public:
+  template <typename Env>
+  struct result
+  {
+    typedef T type;
+  };
 
-    template<typename Env>
-      struct result
-    {
-      typedef T type;
-    };
-
-    __host__ __device__
-    value(const T &arg)
+  _CCCL_HOST_DEVICE value(const T& arg)
       : m_val(arg)
-    {}
+  {}
 
-    template<typename Env>
-    __host__ __device__
-      T eval(const Env &) const
-    {
-      return m_val;
-    }
+  template <typename Env>
+  _CCCL_HOST_DEVICE T eval(const Env&) const
+  {
+    return m_val;
+  }
 
-  private:
-    T m_val;
+private:
+  T m_val;
 }; // end value
 
-template<typename T>
-__host__ __device__
-actor<value<T> > val(const T &x)
+template <typename T>
+_CCCL_HOST_DEVICE actor<value<T>> val(const T& x)
 {
   return value<T>(x);
 } // end val()
 
-
-} // end functional
-} // end detail
+} // namespace functional
+} // namespace detail
 THRUST_NAMESPACE_END
-

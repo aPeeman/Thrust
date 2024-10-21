@@ -28,86 +28,69 @@
 
 #include <thrust/detail/config.h>
 
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 #if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
-#include <iterator>
-#include <thrust/system/cuda/detail/scan.h>
-#include <thrust/distance.h>
+#  include <thrust/detail/type_traits.h>
+#  include <thrust/distance.h>
+#  include <thrust/system/cuda/detail/scan.h>
+
+#  include <iterator>
 
 THRUST_NAMESPACE_BEGIN
 
-namespace cuda_cub {
+namespace cuda_cub
+{
 
-template <class Derived,
-          class InputIt,
-          class OutputIt,
-          class TransformOp,
-          class ScanOp>
-OutputIt __host__ __device__
-transform_inclusive_scan(execution_policy<Derived> &policy,
-                         InputIt                    first,
-                         InputIt                    last,
-                         OutputIt                   result,
-                         TransformOp                transform_op,
-                         ScanOp                     scan_op)
+template <class Derived, class InputIt, class OutputIt, class TransformOp, class ScanOp>
+OutputIt _CCCL_HOST_DEVICE transform_inclusive_scan(
+  execution_policy<Derived>& policy,
+  InputIt first,
+  InputIt last,
+  OutputIt result,
+  TransformOp transform_op,
+  ScanOp scan_op)
 {
   // Use the transformed input iterator's value type per https://wg21.link/P0571
-  using input_type = typename thrust::iterator_value<InputIt>::type;
-#if THRUST_CPP_DIALECT < 2017
-  using result_type = typename std::result_of<TransformOp(input_type)>::type;
-#else
-  using result_type = std::invoke_result_t<TransformOp, input_type>;
-#endif
-
-  using value_type = typename std::remove_reference<result_type>::type;
+  using input_type  = typename thrust::iterator_value<InputIt>::type;
+  using result_type = thrust::detail::invoke_result_t<TransformOp, input_type>;
+  using value_type  = thrust::remove_cvref_t<result_type>;
 
   typedef typename iterator_traits<InputIt>::difference_type size_type;
   size_type num_items = static_cast<size_type>(thrust::distance(first, last));
-  typedef transform_input_iterator_t<value_type,
-                                     InputIt,
-                                     TransformOp>
-      transformed_iterator_t;
+  typedef transform_input_iterator_t<value_type, InputIt, TransformOp> transformed_iterator_t;
 
-  return cuda_cub::inclusive_scan_n(policy,
-                                 transformed_iterator_t(first, transform_op),
-                                 num_items,
-                                 result,
-                                 scan_op);
+  return cuda_cub::inclusive_scan_n(policy, transformed_iterator_t(first, transform_op), num_items, result, scan_op);
 }
 
-template <class Derived,
-          class InputIt,
-          class OutputIt,
-          class TransformOp,
-          class InitialValueType,
-          class ScanOp>
-OutputIt __host__ __device__
-transform_exclusive_scan(execution_policy<Derived> &policy,
-                         InputIt                    first,
-                         InputIt                    last,
-                         OutputIt                   result,
-                         TransformOp                transform_op,
-                         InitialValueType           init,
-                         ScanOp                     scan_op)
+template <class Derived, class InputIt, class OutputIt, class TransformOp, class InitialValueType, class ScanOp>
+OutputIt _CCCL_HOST_DEVICE transform_exclusive_scan(
+  execution_policy<Derived>& policy,
+  InputIt first,
+  InputIt last,
+  OutputIt result,
+  TransformOp transform_op,
+  InitialValueType init,
+  ScanOp scan_op)
 {
   // Use the initial value type per https://wg21.link/P0571
-  using result_type = typename std::remove_reference<InitialValueType>::type;
+  using result_type = thrust::remove_cvref_t<InitialValueType>;
 
   typedef typename iterator_traits<InputIt>::difference_type size_type;
   size_type num_items = static_cast<size_type>(thrust::distance(first, last));
-  typedef transform_input_iterator_t<result_type,
-                                     InputIt,
-                                     TransformOp>
-      transformed_iterator_t;
+  typedef transform_input_iterator_t<result_type, InputIt, TransformOp> transformed_iterator_t;
 
-  return cuda_cub::exclusive_scan_n(policy,
-                                 transformed_iterator_t(first, transform_op),
-                                 num_items,
-                                 result,
-                                 init,
-                                 scan_op);
+  return cuda_cub::exclusive_scan_n(
+    policy, transformed_iterator_t(first, transform_op), num_items, result, init, scan_op);
 }
 
-}    // namespace cuda_cub
+} // namespace cuda_cub
 
 THRUST_NAMESPACE_END
 #endif

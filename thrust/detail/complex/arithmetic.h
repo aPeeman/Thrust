@@ -1,5 +1,5 @@
 /*
- *  Copyright 2008-2013 NVIDIA Corporation
+ *  Copyright 2008-2021 NVIDIA Corporation
  *  Copyright 2013 Filipe RNC Maia
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,105 +20,82 @@
 #include <thrust/detail/config.h>
 
 #include <thrust/complex.h>
+#include <thrust/detail/complex/c99math.h>
+
 #include <cfloat>
 #include <cmath>
-#include <thrust/detail/complex/c99math.h>
 
 THRUST_NAMESPACE_BEGIN
 
-  /* --- Binary Arithmetic Operators --- */
+/* --- Binary Arithmetic Operators --- */
 
 template <typename T0, typename T1>
-__host__ __device__
-complex<typename detail::promoted_numerical_type<T0, T1>::type>
-operator+(const complex<T0>& x, const complex<T1>& y)
+_CCCL_HOST_DEVICE complex<::cuda::std::__common_type_t<T0, T1>> operator+(const complex<T0>& x, const complex<T1>& y)
 {
-  typedef typename detail::promoted_numerical_type<T0, T1>::type T;
+  using T = ::cuda::std::__common_type_t<T0, T1>;
   return complex<T>(x.real() + y.real(), x.imag() + y.imag());
 }
 
 template <typename T0, typename T1>
-__host__ __device__
-complex<typename detail::promoted_numerical_type<T0, T1>::type>
-operator+(const complex<T0>& x, const T1& y)
+_CCCL_HOST_DEVICE complex<::cuda::std::__common_type_t<T0, T1>> operator+(const complex<T0>& x, const T1& y)
 {
-  typedef typename detail::promoted_numerical_type<T0, T1>::type T;
+  using T = ::cuda::std::__common_type_t<T0, T1>;
   return complex<T>(x.real() + y, x.imag());
 }
 
 template <typename T0, typename T1>
-__host__ __device__
-complex<typename detail::promoted_numerical_type<T0, T1>::type>
-operator+(const T0& x, const complex<T1>& y)
+_CCCL_HOST_DEVICE complex<::cuda::std::__common_type_t<T0, T1>> operator+(const T0& x, const complex<T1>& y)
 {
-  typedef typename detail::promoted_numerical_type<T0, T1>::type T;
+  using T = ::cuda::std::__common_type_t<T0, T1>;
   return complex<T>(x + y.real(), y.imag());
 }
 
-
 template <typename T0, typename T1>
-__host__ __device__
-complex<typename detail::promoted_numerical_type<T0, T1>::type>
-operator-(const complex<T0>& x, const complex<T1>& y)
+_CCCL_HOST_DEVICE complex<::cuda::std::__common_type_t<T0, T1>> operator-(const complex<T0>& x, const complex<T1>& y)
 {
-  typedef typename detail::promoted_numerical_type<T0, T1>::type T;
+  using T = ::cuda::std::__common_type_t<T0, T1>;
   return complex<T>(x.real() - y.real(), x.imag() - y.imag());
 }
 
 template <typename T0, typename T1>
-__host__ __device__
-complex<typename detail::promoted_numerical_type<T0, T1>::type>
-operator-(const complex<T0>& x, const T1& y)
+_CCCL_HOST_DEVICE complex<::cuda::std::__common_type_t<T0, T1>> operator-(const complex<T0>& x, const T1& y)
 {
-  typedef typename detail::promoted_numerical_type<T0, T1>::type T;
+  using T = ::cuda::std::__common_type_t<T0, T1>;
   return complex<T>(x.real() - y, x.imag());
 }
 
 template <typename T0, typename T1>
-__host__ __device__
-complex<typename detail::promoted_numerical_type<T0, T1>::type>
-operator-(const T0& x, const complex<T1>& y)
+_CCCL_HOST_DEVICE complex<::cuda::std::__common_type_t<T0, T1>> operator-(const T0& x, const complex<T1>& y)
 {
-  typedef typename detail::promoted_numerical_type<T0, T1>::type T;
+  using T = ::cuda::std::__common_type_t<T0, T1>;
   return complex<T>(x - y.real(), -y.imag());
 }
 
-
 template <typename T0, typename T1>
-__host__ __device__
-complex<typename detail::promoted_numerical_type<T0, T1>::type>
-operator*(const complex<T0>& x, const complex<T1>& y)
+_CCCL_HOST_DEVICE complex<::cuda::std::__common_type_t<T0, T1>> operator*(const complex<T0>& x, const complex<T1>& y)
 {
-  typedef typename detail::promoted_numerical_type<T0, T1>::type T;
-  return complex<T>( x.real() * y.real() - x.imag() * y.imag()
-			             , x.real() * y.imag() + x.imag() * y.real());
+  using T = ::cuda::std::__common_type_t<T0, T1>;
+  return complex<T>(x.real() * y.real() - x.imag() * y.imag(), x.real() * y.imag() + x.imag() * y.real());
 }
 
 template <typename T0, typename T1>
-__host__ __device__
-complex<typename detail::promoted_numerical_type<T0, T1>::type>
-operator*(const complex<T0>& x, const T1& y)
+_CCCL_HOST_DEVICE complex<::cuda::std::__common_type_t<T0, T1>> operator*(const complex<T0>& x, const T1& y)
 {
-  typedef typename detail::promoted_numerical_type<T0, T1>::type T;
+  using T = ::cuda::std::__common_type_t<T0, T1>;
   return complex<T>(x.real() * y, x.imag() * y);
 }
 
 template <typename T0, typename T1>
-__host__ __device__
-complex<typename detail::promoted_numerical_type<T0, T1>::type>
-operator*(const T0& x, const complex<T1>& y)
+_CCCL_HOST_DEVICE complex<::cuda::std::__common_type_t<T0, T1>> operator*(const T0& x, const complex<T1>& y)
 {
-  typedef typename detail::promoted_numerical_type<T0, T1>::type T;
+  using T = ::cuda::std::__common_type_t<T0, T1>;
   return complex<T>(x * y.real(), x * y.imag());
 }
 
-
 template <typename T0, typename T1>
-__host__ __device__
-complex<typename detail::promoted_numerical_type<T0, T1>::type>
-operator/(const complex<T0>& x, const complex<T1>& y)
+_CCCL_HOST_DEVICE complex<::cuda::std::__common_type_t<T0, T1>> operator/(const complex<T0>& x, const complex<T1>& y)
 {
-  typedef typename detail::promoted_numerical_type<T0, T1>::type T;
+  using T = ::cuda::std::__common_type_t<T0, T1>;
 
   // Find `abs` by ADL.
   using std::abs;
@@ -136,121 +113,101 @@ operator/(const complex<T0>& x, const complex<T1>& y)
 
   oos = T(1.0) / s;
 
-  complex<T> quot( ((ars * brs) + (ais * bis)) * oos
-                 , ((ais * brs) - (ars * bis)) * oos);
+  complex<T> quot(((ars * brs) + (ais * bis)) * oos, ((ais * brs) - (ars * bis)) * oos);
   return quot;
 }
 
 template <typename T0, typename T1>
-__host__ __device__
-complex<typename detail::promoted_numerical_type<T0, T1>::type>
-operator/(const complex<T0>& x, const T1& y)
+_CCCL_HOST_DEVICE complex<::cuda::std::__common_type_t<T0, T1>> operator/(const complex<T0>& x, const T1& y)
 {
-  typedef typename detail::promoted_numerical_type<T0, T1>::type T;
+  using T = ::cuda::std::__common_type_t<T0, T1>;
   return complex<T>(x.real() / y, x.imag() / y);
 }
 
 template <typename T0, typename T1>
-__host__ __device__
-complex<typename detail::promoted_numerical_type<T0, T1>::type>
-operator/(const T0& x, const complex<T1>& y)
+_CCCL_HOST_DEVICE complex<::cuda::std::__common_type_t<T0, T1>> operator/(const T0& x, const complex<T1>& y)
 {
-  typedef typename detail::promoted_numerical_type<T0, T1>::type T;
+  using T = ::cuda::std::__common_type_t<T0, T1>;
   return complex<T>(x) / y;
 }
 
-
-
 /* --- Unary Arithmetic Operators --- */
 
-template <typename T> 
-__host__ __device__
-complex<T> operator+(const complex<T>& y)
+template <typename T>
+_CCCL_HOST_DEVICE complex<T> operator+(const complex<T>& y)
 {
   return y;
 }
 
-template <typename T> 
-__host__ __device__
-complex<T> operator-(const complex<T>& y)
+template <typename T>
+_CCCL_HOST_DEVICE complex<T> operator-(const complex<T>& y)
 {
   return y * -T(1);
 }
-
 
 /* --- Other Basic Arithmetic Functions --- */
 
 // As std::hypot is only C++11 we have to use the C interface
 template <typename T>
-__host__ __device__
-T abs(const complex<T>& z)
+_CCCL_HOST_DEVICE T abs(const complex<T>& z)
 {
   return hypot(z.real(), z.imag());
 }
 
 // XXX Why are we specializing here?
-namespace detail {
-namespace complex {	
-
-__host__ __device__
-inline float abs(const thrust::complex<float>& z)
+namespace detail
 {
-  return hypotf(z.real(),z.imag());
+namespace complex
+{
+
+_CCCL_HOST_DEVICE inline float abs(const thrust::complex<float>& z)
+{
+  return hypotf(z.real(), z.imag());
 }
 
-__host__ __device__
-inline double abs(const thrust::complex<double>& z)
+_CCCL_HOST_DEVICE inline double abs(const thrust::complex<double>& z)
 {
-  return hypot(z.real(),z.imag());
+  return hypot(z.real(), z.imag());
 }
 
 } // end namespace complex
 } // end namespace detail
 
 template <>
-__host__ __device__
-inline float abs(const complex<float>& z)
+_CCCL_HOST_DEVICE inline float abs(const complex<float>& z)
 {
   return detail::complex::abs(z);
 }
 
 template <>
-__host__ __device__
-inline double abs(const complex<double>& z)
+_CCCL_HOST_DEVICE inline double abs(const complex<double>& z)
 {
   return detail::complex::abs(z);
 }
 
-
 template <typename T>
-__host__ __device__
-T arg(const complex<T>& z)
+_CCCL_HOST_DEVICE T arg(const complex<T>& z)
 {
   // Find `atan2` by ADL.
   using std::atan2;
   return atan2(z.imag(), z.real());
 }
 
-
 template <typename T>
-__host__ __device__
-complex<T> conj(const complex<T>& z)
+_CCCL_HOST_DEVICE complex<T> conj(const complex<T>& z)
 {
   return complex<T>(z.real(), -z.imag());
 }
 
-
 template <typename T>
-__host__ __device__
-T norm(const complex<T>& z)
+_CCCL_HOST_DEVICE T norm(const complex<T>& z)
 {
   return z.real() * z.real() + z.imag() * z.imag();
 }
 
 // XXX Why specialize these, we could just rely on ADL.
 template <>
-__host__ __device__
-inline float norm(const complex<float>& z)
+_CCCL_HOST_DEVICE inline float norm(const complex<float>& z)
 {
   // Find `abs` and `sqrt` by ADL.
   using std::abs;
@@ -261,14 +218,13 @@ inline float norm(const complex<float>& z)
     float a = z.real() * 4.0f;
     float b = z.imag() * 4.0f;
     return (a * a + b * b) / 16.0f;
-  } 
+  }
 
   return z.real() * z.real() + z.imag() * z.imag();
 }
 
 template <>
-__host__ __device__
-inline double norm(const complex<double>& z)
+_CCCL_HOST_DEVICE inline double norm(const complex<double>& z)
 {
   // Find `abs` and `sqrt` by ADL.
   using std::abs;
@@ -279,18 +235,15 @@ inline double norm(const complex<double>& z)
     double a = z.real() * 4.0;
     double b = z.imag() * 4.0;
     return (a * a + b * b) / 16.0;
-  } 
+  }
 
   return z.real() * z.real() + z.imag() * z.imag();
 }
 
-
 template <typename T0, typename T1>
-__host__ __device__
-complex<typename detail::promoted_numerical_type<T0, T1>::type>
-polar(const T0& m, const T1& theta)
-{ 
-  typedef typename detail::promoted_numerical_type<T0, T1>::type T;
+_CCCL_HOST_DEVICE complex<::cuda::std::__common_type_t<T0, T1>> polar(const T0& m, const T1& theta)
+{
+  using T = ::cuda::std::__common_type_t<T0, T1>;
 
   // Find `cos` and `sin` by ADL.
   using std::cos;
@@ -300,4 +253,3 @@ polar(const T0& m, const T1& theta)
 }
 
 THRUST_NAMESPACE_END
-

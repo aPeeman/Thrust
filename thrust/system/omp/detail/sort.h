@@ -17,6 +17,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/system/omp/detail/execution_policy.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -27,23 +35,22 @@ namespace omp
 namespace detail
 {
 
-template<typename DerivedPolicy,
-         typename RandomAccessIterator,
-         typename StrictWeakOrdering>
-void stable_sort(execution_policy<DerivedPolicy> &exec,
+template <typename DerivedPolicy, typename RandomAccessIterator, typename StrictWeakOrdering>
+void stable_sort(execution_policy<DerivedPolicy>& exec,
                  RandomAccessIterator first,
                  RandomAccessIterator last,
                  StrictWeakOrdering comp);
-    
-template<typename DerivedPolicy,
-         typename RandomAccessIterator1,
-         typename RandomAccessIterator2,
-         typename StrictWeakOrdering>
-void stable_sort_by_key(execution_policy<DerivedPolicy> &exec,
-                        RandomAccessIterator1 keys_first,
-                        RandomAccessIterator1 keys_last,
-                        RandomAccessIterator2 values_first,
-                        StrictWeakOrdering comp);
+
+template <typename DerivedPolicy,
+          typename RandomAccessIterator1,
+          typename RandomAccessIterator2,
+          typename StrictWeakOrdering>
+void stable_sort_by_key(
+  execution_policy<DerivedPolicy>& exec,
+  RandomAccessIterator1 keys_first,
+  RandomAccessIterator1 keys_last,
+  RandomAccessIterator2 values_first,
+  StrictWeakOrdering comp);
 
 } // end namespace detail
 } // end namespace omp
@@ -51,4 +58,3 @@ void stable_sort_by_key(execution_policy<DerivedPolicy> &exec,
 THRUST_NAMESPACE_END
 
 #include <thrust/system/omp/detail/sort.inl>
-

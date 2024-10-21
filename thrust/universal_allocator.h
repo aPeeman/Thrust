@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file universal_allocator.h
  *  \brief An allocator which creates new elements in memory accessible to both
  *         hosts and devices.
@@ -23,6 +22,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 
 // #include the device system's vector header
 #define __THRUST_DEVICE_SYSTEM_MEMORY_HEADER <__THRUST_DEVICE_SYSTEM_ROOT/memory.h>
@@ -68,8 +75,7 @@ using thrust::system::__THRUST_DEVICE_SYSTEM_NAMESPACE::universal_allocator;
  *  \see raw_pointer_cast
  */
 template <typename T>
-using universal_ptr =
-  thrust::system::__THRUST_DEVICE_SYSTEM_NAMESPACE::universal_pointer<T>;
+using universal_ptr = thrust::system::__THRUST_DEVICE_SYSTEM_NAMESPACE::universal_pointer<T>;
 
 /*! \}
  */

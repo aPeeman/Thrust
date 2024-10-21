@@ -14,15 +14,22 @@
  *  limitations under the License.
  */
 
-
 /*! \file for_each.h
- *  \brief Defines the interface for a function that executes a 
+ *  \brief Defines the interface for a function that executes a
  *  function or functional for each value in a given range.
  */
 
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/system/omp/detail/execution_policy.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -33,22 +40,13 @@ namespace omp
 namespace detail
 {
 
-template<typename DerivedPolicy,
-         typename RandomAccessIterator,
-         typename UnaryFunction>
-  RandomAccessIterator for_each(execution_policy<DerivedPolicy> &exec,
-                                RandomAccessIterator first,
-                                RandomAccessIterator last,
-                                UnaryFunction f);
+template <typename DerivedPolicy, typename RandomAccessIterator, typename UnaryFunction>
+RandomAccessIterator
+for_each(execution_policy<DerivedPolicy>& exec, RandomAccessIterator first, RandomAccessIterator last, UnaryFunction f);
 
-template<typename DerivedPolicy,
-         typename RandomAccessIterator,
-         typename Size,
-         typename UnaryFunction>
-  RandomAccessIterator for_each_n(execution_policy<DerivedPolicy> &exec,
-                                  RandomAccessIterator first,
-                                  Size n,
-                                  UnaryFunction f);
+template <typename DerivedPolicy, typename RandomAccessIterator, typename Size, typename UnaryFunction>
+RandomAccessIterator
+for_each_n(execution_policy<DerivedPolicy>& exec, RandomAccessIterator first, Size n, UnaryFunction f);
 
 } // end namespace detail
 } // end namespace omp
@@ -56,4 +54,3 @@ template<typename DerivedPolicy,
 THRUST_NAMESPACE_END
 
 #include <thrust/system/omp/detail/for_each.inl>
-

@@ -28,46 +28,36 @@
 
 #include <thrust/detail/config.h>
 
-#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
-#include <thrust/system/cuda/config.h>
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 
-#include <thrust/system/cuda/detail/mismatch.h>
+#if THRUST_DEVICE_COMPILER == THRUST_DEVICE_COMPILER_NVCC
+#  include <thrust/system/cuda/config.h>
+
+#  include <thrust/system/cuda/detail/mismatch.h>
 
 THRUST_NAMESPACE_BEGIN
-namespace cuda_cub {
+namespace cuda_cub
+{
 
-template <class Derived,
-          class InputIt1,
-          class InputIt2,
-          class BinaryPred>
-bool __host__ __device__
-equal(execution_policy<Derived>& policy,
-      InputIt1                   first1,
-      InputIt1                   last1,
-      InputIt2                   first2,
-      BinaryPred                 binary_pred)
+template <class Derived, class InputIt1, class InputIt2, class BinaryPred>
+bool _CCCL_HOST_DEVICE
+equal(execution_policy<Derived>& policy, InputIt1 first1, InputIt1 last1, InputIt2 first2, BinaryPred binary_pred)
 {
   return cuda_cub::mismatch(policy, first1, last1, first2, binary_pred).first == last1;
 }
 
-template <class Derived,
-          class InputIt1,
-          class InputIt2>
-bool __host__ __device__
-equal(execution_policy<Derived>& policy,
-      InputIt1                   first1,
-      InputIt1                   last1,
-      InputIt2                   first2)
+template <class Derived, class InputIt1, class InputIt2>
+bool _CCCL_HOST_DEVICE equal(execution_policy<Derived>& policy, InputIt1 first1, InputIt1 last1, InputIt2 first2)
 {
   typedef typename thrust::iterator_value<InputIt1>::type InputType1;
-  return cuda_cub::equal(policy,
-                         first1,
-                         last1,
-                         first2,
-                         equal_to<InputType1>());
+  return cuda_cub::equal(policy, first1, last1, first2, equal_to<InputType1>());
 }
-
-
 
 } // namespace cuda_cub
 THRUST_NAMESPACE_END

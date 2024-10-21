@@ -14,12 +14,22 @@
  *  limitations under the License.
  */
 
+#pragma once
+
 #include <thrust/detail/config.h>
-#include <thrust/system/detail/generic/uninitialized_fill.h>
-#include <thrust/fill.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/internal_functional.h>
 #include <thrust/detail/type_traits.h>
+#include <thrust/fill.h>
 #include <thrust/iterator/iterator_traits.h>
+#include <thrust/system/detail/generic/uninitialized_fill.h>
 
 THRUST_NAMESPACE_BEGIN
 namespace system
@@ -31,103 +41,81 @@ namespace generic
 namespace detail
 {
 
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename T>
-__host__ __device__
-  void uninitialized_fill(thrust::execution_policy<DerivedPolicy> &exec,
-                          ForwardIterator first,
-                          ForwardIterator last,
-                          const T &x,
-                          thrust::detail::true_type) // has_trivial_copy_constructor
+template <typename DerivedPolicy, typename ForwardIterator, typename T>
+_CCCL_HOST_DEVICE void uninitialized_fill(
+  thrust::execution_policy<DerivedPolicy>& exec,
+  ForwardIterator first,
+  ForwardIterator last,
+  const T& x,
+  thrust::detail::true_type) // ::cuda::std::is_trivially_copy_constructible
 {
   thrust::fill(exec, first, last, x);
 } // end uninitialized_fill()
 
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename T>
-__host__ __device__
-  void uninitialized_fill(thrust::execution_policy<DerivedPolicy> &exec,
-                          ForwardIterator first,
-                          ForwardIterator last,
-                          const T &x,
-                          thrust::detail::false_type) // has_trivial_copy_constructor
+template <typename DerivedPolicy, typename ForwardIterator, typename T>
+_CCCL_HOST_DEVICE void uninitialized_fill(
+  thrust::execution_policy<DerivedPolicy>& exec,
+  ForwardIterator first,
+  ForwardIterator last,
+  const T& x,
+  thrust::detail::false_type) // ::cuda::std::is_trivially_copy_constructible
 {
   typedef typename iterator_traits<ForwardIterator>::value_type ValueType;
 
   thrust::for_each(exec, first, last, thrust::detail::uninitialized_fill_functor<ValueType>(x));
 } // end uninitialized_fill()
 
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename Size,
-         typename T>
-__host__ __device__
-  ForwardIterator uninitialized_fill_n(thrust::execution_policy<DerivedPolicy> &exec,
-                                       ForwardIterator first,
-                                       Size n,
-                                       const T &x,
-                                       thrust::detail::true_type) // has_trivial_copy_constructor
+template <typename DerivedPolicy, typename ForwardIterator, typename Size, typename T>
+_CCCL_HOST_DEVICE ForwardIterator uninitialized_fill_n(
+  thrust::execution_policy<DerivedPolicy>& exec,
+  ForwardIterator first,
+  Size n,
+  const T& x,
+  thrust::detail::true_type) // ::cuda::std::is_trivially_copy_constructible
 {
   return thrust::fill_n(exec, first, n, x);
 } // end uninitialized_fill()
 
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename Size,
-         typename T>
-__host__ __device__
-  ForwardIterator uninitialized_fill_n(thrust::execution_policy<DerivedPolicy> &exec,
-                                       ForwardIterator first,
-                                       Size n,
-                                       const T &x,
-                                       thrust::detail::false_type) // has_trivial_copy_constructor
+template <typename DerivedPolicy, typename ForwardIterator, typename Size, typename T>
+_CCCL_HOST_DEVICE ForwardIterator uninitialized_fill_n(
+  thrust::execution_policy<DerivedPolicy>& exec,
+  ForwardIterator first,
+  Size n,
+  const T& x,
+  thrust::detail::false_type) // ::cuda::std::is_trivially_copy_constructible
 {
   typedef typename iterator_traits<ForwardIterator>::value_type ValueType;
 
   return thrust::for_each_n(exec, first, n, thrust::detail::uninitialized_fill_functor<ValueType>(x));
 } // end uninitialized_fill()
 
-} // end detail
+} // namespace detail
 
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename T>
-__host__ __device__
-  void uninitialized_fill(thrust::execution_policy<DerivedPolicy> &exec,
-                          ForwardIterator first,
-                          ForwardIterator last,
-                          const T &x)
+template <typename DerivedPolicy, typename ForwardIterator, typename T>
+_CCCL_HOST_DEVICE void uninitialized_fill(
+  thrust::execution_policy<DerivedPolicy>& exec, ForwardIterator first, ForwardIterator last, const T& x)
 {
   typedef typename iterator_traits<ForwardIterator>::value_type ValueType;
 
-  typedef thrust::detail::has_trivial_copy_constructor<ValueType> ValueTypeHasTrivialCopyConstructor;
+  typedef ::cuda::std::is_trivially_copy_constructible<ValueType> ValueTypeHasTrivialCopyConstructor;
 
-  thrust::system::detail::generic::detail::uninitialized_fill(exec, first, last, x,
-    ValueTypeHasTrivialCopyConstructor());
+  thrust::system::detail::generic::detail::uninitialized_fill(
+    exec, first, last, x, ValueTypeHasTrivialCopyConstructor());
 } // end uninitialized_fill()
 
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename Size,
-         typename T>
-__host__ __device__
-  ForwardIterator uninitialized_fill_n(thrust::execution_policy<DerivedPolicy> &exec,
-                                       ForwardIterator first,
-                                       Size n,
-                                       const T &x)
+template <typename DerivedPolicy, typename ForwardIterator, typename Size, typename T>
+_CCCL_HOST_DEVICE ForwardIterator
+uninitialized_fill_n(thrust::execution_policy<DerivedPolicy>& exec, ForwardIterator first, Size n, const T& x)
 {
   typedef typename iterator_traits<ForwardIterator>::value_type ValueType;
 
-  typedef thrust::detail::has_trivial_copy_constructor<ValueType> ValueTypeHasTrivialCopyConstructor;
+  typedef ::cuda::std::is_trivially_copy_constructible<ValueType> ValueTypeHasTrivialCopyConstructor;
 
-  return thrust::system::detail::generic::detail::uninitialized_fill_n(exec, first, n, x,
-    ValueTypeHasTrivialCopyConstructor());
+  return thrust::system::detail::generic::detail::uninitialized_fill_n(
+    exec, first, n, x, ValueTypeHasTrivialCopyConstructor());
 } // end uninitialized_fill()
 
 } // end namespace generic
 } // end namespace detail
 } // end namespace system
 THRUST_NAMESPACE_END
-

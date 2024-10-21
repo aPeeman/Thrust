@@ -21,6 +21,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/system/detail/sequential/execution_policy.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -31,27 +39,13 @@ namespace detail
 namespace sequential
 {
 
+template <typename DerivedPolicy, typename InputIterator, typename OutputIterator>
+_CCCL_HOST_DEVICE OutputIterator
+copy(sequential::execution_policy<DerivedPolicy>& exec, InputIterator first, InputIterator last, OutputIterator result);
 
-template<typename DerivedPolicy,
-         typename InputIterator,
-         typename OutputIterator>
-__host__ __device__
-  OutputIterator copy(sequential::execution_policy<DerivedPolicy> &exec,
-                      InputIterator first,
-                      InputIterator last,
-                      OutputIterator result);
-
-
-template<typename DerivedPolicy,
-         typename InputIterator,
-         typename Size,
-         typename OutputIterator>
-__host__ __device__
-  OutputIterator copy_n(sequential::execution_policy<DerivedPolicy> &exec,
-                        InputIterator first,
-                        Size n,
-                        OutputIterator result);
-
+template <typename DerivedPolicy, typename InputIterator, typename Size, typename OutputIterator>
+_CCCL_HOST_DEVICE OutputIterator
+copy_n(sequential::execution_policy<DerivedPolicy>& exec, InputIterator first, Size n, OutputIterator result);
 
 } // end namespace sequential
 } // end namespace detail
@@ -59,4 +53,3 @@ __host__ __device__
 THRUST_NAMESPACE_END
 
 #include <thrust/system/detail/sequential/copy.inl>
-

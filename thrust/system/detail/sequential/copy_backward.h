@@ -18,6 +18,14 @@
 
 #include <thrust/detail/config.h>
 
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 THRUST_NAMESPACE_BEGIN
 namespace system
 {
@@ -26,14 +34,10 @@ namespace detail
 namespace sequential
 {
 
-
-__thrust_exec_check_disable__
-template<typename BidirectionalIterator1,
-         typename BidirectionalIterator2>
-__host__ __device__
-BidirectionalIterator2 copy_backward(BidirectionalIterator1 first, 
-                                     BidirectionalIterator1 last, 
-                                     BidirectionalIterator2 result)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename BidirectionalIterator1, typename BidirectionalIterator2>
+_CCCL_HOST_DEVICE BidirectionalIterator2
+copy_backward(BidirectionalIterator1 first, BidirectionalIterator1 last, BidirectionalIterator2 result)
 {
   while (first != last)
   {
@@ -45,9 +49,7 @@ BidirectionalIterator2 copy_backward(BidirectionalIterator1 first,
   return result;
 }
 
-
 } // end namespace sequential
 } // end namespace detail
 } // end namespace system
 THRUST_NAMESPACE_END
-

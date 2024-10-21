@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file reduce.h
  *  \brief OpenMP implementation of reduce algorithms.
  */
@@ -22,6 +21,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/system/omp/detail/execution_policy.h>
 
 THRUST_NAMESPACE_BEGIN
@@ -32,17 +39,12 @@ namespace omp
 namespace detail
 {
 
-
-template<typename DerivedPolicy,
-         typename InputIterator, 
-         typename OutputType,
-         typename BinaryFunction>
-  OutputType reduce(execution_policy<DerivedPolicy> &exec,
-                    InputIterator first,
-                    InputIterator last,
-                    OutputType init,
-                    BinaryFunction binary_op);
-
+template <typename DerivedPolicy, typename InputIterator, typename OutputType, typename BinaryFunction>
+OutputType reduce(execution_policy<DerivedPolicy>& exec,
+                  InputIterator first,
+                  InputIterator last,
+                  OutputType init,
+                  BinaryFunction binary_op);
 
 } // end namespace detail
 } // end namespace omp
@@ -50,4 +52,3 @@ template<typename DerivedPolicy,
 THRUST_NAMESPACE_END
 
 #include <thrust/system/omp/detail/reduce.inl>
-

@@ -17,6 +17,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/functional/actor.h>
 #include <thrust/detail/functional/argument.h>
 
@@ -26,13 +34,12 @@ namespace detail
 namespace functional
 {
 
-template<unsigned int i>
-  struct placeholder
+template <unsigned int i>
+struct placeholder
 {
-  typedef actor<argument<i> > type;
+  typedef actor<argument<i>> type;
 };
 
-} // end functional
-} // end detail
+} // namespace functional
+} // namespace detail
 THRUST_NAMESPACE_END
-

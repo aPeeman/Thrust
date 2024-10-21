@@ -17,10 +17,17 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/execution_policy.h>
-#include <thrust/system/detail/generic/tag.h>
 #include <thrust/mr/memory_resource.h>
-#include <thrust/detail/execution_policy.h>
+#include <thrust/system/detail/generic/tag.h>
 
 THRUST_NAMESPACE_BEGIN
 namespace system
@@ -30,17 +37,13 @@ namespace detail
 namespace generic
 {
 
-
-template<typename MR, typename DerivedPolicy>
-__host__
-MR * get_per_device_resource(thrust::detail::execution_policy_base<DerivedPolicy>&)
+template <typename MR, typename DerivedPolicy>
+_CCCL_HOST MR* get_per_device_resource(thrust::detail::execution_policy_base<DerivedPolicy>&)
 {
-    return mr::get_global_resource<MR>();
+  return mr::get_global_resource<MR>();
 }
 
-
-} // end generic
-} // end detail
-} // end system
+} // namespace generic
+} // namespace detail
+} // namespace system
 THRUST_NAMESPACE_END
-

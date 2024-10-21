@@ -14,7 +14,6 @@
  *  limitations under the License.
  */
 
-
 /*! \file remove.h
  *  \brief Sequential implementations of remove functions.
  */
@@ -22,6 +21,14 @@
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/detail/function.h>
 #include <thrust/system/detail/sequential/execution_policy.h>
 
@@ -33,38 +40,33 @@ namespace detail
 namespace sequential
 {
 
-
-__thrust_exec_check_disable__
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename Predicate>
-__host__ __device__
-  ForwardIterator remove_if(sequential::execution_policy<DerivedPolicy> &,
-                            ForwardIterator first,
-                            ForwardIterator last,
-                            Predicate pred)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy, typename ForwardIterator, typename Predicate>
+_CCCL_HOST_DEVICE ForwardIterator
+remove_if(sequential::execution_policy<DerivedPolicy>&, ForwardIterator first, ForwardIterator last, Predicate pred)
 {
   // wrap pred
-  thrust::detail::wrapped_function<
-    Predicate,
-    bool
-  > wrapped_pred(pred);
+  thrust::detail::wrapped_function<Predicate, bool> wrapped_pred(pred);
 
   // advance iterators until wrapped_pred(*first) is true or we reach the end of input
-  while(first != last && !wrapped_pred(*first))
+  while (first != last && !wrapped_pred(*first))
+  {
     ++first;
+  }
 
-  if(first == last)
+  if (first == last)
+  {
     return first;
+  }
 
-  // result always trails first 
+  // result always trails first
   ForwardIterator result = first;
 
   ++first;
 
-  while(first != last)
+  while (first != last)
   {
-    if(!wrapped_pred(*first))
+    if (!wrapped_pred(*first))
     {
       *result = *first;
       ++result;
@@ -75,44 +77,39 @@ __host__ __device__
   return result;
 }
 
-
-__thrust_exec_check_disable__
-template<typename DerivedPolicy,
-         typename ForwardIterator,
-         typename InputIterator,
-         typename Predicate>
-__host__ __device__
-  ForwardIterator remove_if(sequential::execution_policy<DerivedPolicy> &,
-                            ForwardIterator first,
-                            ForwardIterator last,
-                            InputIterator stencil,
-                            Predicate pred)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy, typename ForwardIterator, typename InputIterator, typename Predicate>
+_CCCL_HOST_DEVICE ForwardIterator remove_if(
+  sequential::execution_policy<DerivedPolicy>&,
+  ForwardIterator first,
+  ForwardIterator last,
+  InputIterator stencil,
+  Predicate pred)
 {
   // wrap pred
-  thrust::detail::wrapped_function<
-    Predicate,
-    bool
-  > wrapped_pred(pred);
+  thrust::detail::wrapped_function<Predicate, bool> wrapped_pred(pred);
 
   // advance iterators until wrapped_pred(*stencil) is true or we reach the end of input
-  while(first != last && !wrapped_pred(*stencil))
+  while (first != last && !wrapped_pred(*stencil))
   {
     ++first;
     ++stencil;
   }
 
-  if(first == last)
+  if (first == last)
+  {
     return first;
+  }
 
-  // result always trails first 
+  // result always trails first
   ForwardIterator result = first;
 
   ++first;
   ++stencil;
 
-  while(first != last)
+  while (first != last)
   {
-    if(!wrapped_pred(*stencil))
+    if (!wrapped_pred(*stencil))
     {
       *result = *first;
       ++result;
@@ -124,24 +121,17 @@ __host__ __device__
   return result;
 }
 
-
-__thrust_exec_check_disable__
-template<typename DerivedPolicy,
-         typename InputIterator,
-         typename OutputIterator,
-         typename Predicate>
-__host__ __device__
-  OutputIterator remove_copy_if(sequential::execution_policy<DerivedPolicy> &,
-                                InputIterator first,
-                                InputIterator last,
-                                OutputIterator result,
-                                Predicate pred)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy, typename InputIterator, typename OutputIterator, typename Predicate>
+_CCCL_HOST_DEVICE OutputIterator remove_copy_if(
+  sequential::execution_policy<DerivedPolicy>&,
+  InputIterator first,
+  InputIterator last,
+  OutputIterator result,
+  Predicate pred)
 {
   // wrap pred
-  thrust::detail::wrapped_function<
-    Predicate,
-    bool
-  > wrapped_pred(pred);
+  thrust::detail::wrapped_function<Predicate, bool> wrapped_pred(pred);
 
   while (first != last)
   {
@@ -157,26 +147,22 @@ __host__ __device__
   return result;
 }
 
-
-__thrust_exec_check_disable__
-template<typename DerivedPolicy,
-         typename InputIterator1,
-         typename InputIterator2,
-         typename OutputIterator,
-         typename Predicate>
-__host__ __device__
-  OutputIterator remove_copy_if(sequential::execution_policy<DerivedPolicy> &,
-                                InputIterator1 first,
-                                InputIterator1 last,
-                                InputIterator2 stencil,
-                                OutputIterator result,
-                                Predicate pred)
+_CCCL_EXEC_CHECK_DISABLE
+template <typename DerivedPolicy,
+          typename InputIterator1,
+          typename InputIterator2,
+          typename OutputIterator,
+          typename Predicate>
+_CCCL_HOST_DEVICE OutputIterator remove_copy_if(
+  sequential::execution_policy<DerivedPolicy>&,
+  InputIterator1 first,
+  InputIterator1 last,
+  InputIterator2 stencil,
+  OutputIterator result,
+  Predicate pred)
 {
   // wrap pred
-  thrust::detail::wrapped_function<
-    Predicate,
-    bool
-  > wrapped_pred(pred);
+  thrust::detail::wrapped_function<Predicate, bool> wrapped_pred(pred);
 
   while (first != last)
   {
@@ -193,9 +179,7 @@ __host__ __device__
   return result;
 }
 
-
 } // end namespace sequential
 } // end namespace detail
 } // end namespace system
 THRUST_NAMESPACE_END
-

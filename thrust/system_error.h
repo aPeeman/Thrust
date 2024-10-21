@@ -1,5 +1,5 @@
 /*
- *  Copyright 2008-2013 NVIDIA Corporation
+ *  Copyright 2008-2021 NVIDIA Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -22,6 +22,14 @@
 
 #include <thrust/detail/config.h>
 
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
 THRUST_NAMESPACE_BEGIN
 
 /*! \addtogroup system
@@ -29,16 +37,16 @@ THRUST_NAMESPACE_BEGIN
  */
 
 /*! \namespace thrust::system
- *  \brief \p thrust::system is the namespace which contains functionality for manipulating
- *         memory specific to one of Thrust's backend systems. It also contains functionality
- *         for reporting error conditions originating from the operating system or other
- *         low-level application program interfaces such as the CUDA runtime.
- *         They are provided in a separate namespace for import convenience but are
+ *  \brief \p thrust::system is the namespace which contains specific Thrust
+ *         backend systems. It also contains functionality for reporting error
+ *         conditions originating from the operating system or other low-level
+ *         application program interfaces such as the CUDA runtime. They are
+ *         provided in a separate namespace for import convenience but are
  *         also aliased in the top-level \p thrust namespace for easy access.
  */
 namespace system
 {
-} // end system
+} // namespace system
 
 /*! \} // end system
  */

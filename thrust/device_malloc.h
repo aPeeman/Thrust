@@ -14,21 +14,28 @@
  *  limitations under the License.
  */
 
-
-/*! \file device_malloc.h
- *  \brief Allocates storage in device memory
+/*! \file
+ *  \brief Allocates storage in device memory.
  */
 
 #pragma once
 
 #include <thrust/detail/config.h>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
 #include <thrust/device_ptr.h>
+
 #include <cstddef> // for std::size_t
 
 THRUST_NAMESPACE_BEGIN
 
-/*! \addtogroup allocation_functions Allocation Functions
- *  \ingroup memory_management_functions
+/*! \addtogroup memory_management Memory Management
  *  \{
  */
 
@@ -90,13 +97,12 @@ inline thrust::device_ptr<void> device_malloc(const std::size_t n);
  *  \see device_ptr
  *  \see device_free
  */
-template<typename T>
-  inline thrust::device_ptr<T> device_malloc(const std::size_t n);
+template <typename T>
+inline thrust::device_ptr<T> device_malloc(const std::size_t n);
 
-/*! \}
+/*! \} // memory_management
  */
 
 THRUST_NAMESPACE_END
 
 #include <thrust/detail/device_malloc.inl>
-
